@@ -54,13 +54,16 @@
   .c6{width:120px;height:36px;top:48%;left:-160px;opacity:.8;animation:drift 34s linear infinite;animation-delay:-22s}
   @keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 440px))}}
 
-  /* 飞机 + 尾迹 */
-  .plane{position:absolute;top:18%;left:-16vw;font-size:34px;filter:drop-shadow(0 3px 4px rgba(60,110,150,.35));
-    animation:fly 26s linear infinite;animation-delay:-4s}
-  .plane.p2{top:54%;font-size:24px;animation-duration:36s;animation-delay:-20s;opacity:.8}
-  .plane::before{content:"";position:absolute;top:50%;right:100%;width:26vw;height:4px;transform:translateY(-50%);
-    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9));border-radius:4px}
-  @keyframes fly{from{transform:translate(0,0)}50%{transform:translate(60vw,-3vh)}to{transform:translate(132vw,2vh)}}
+  /* 飞过的角色动图 + 尾迹 */
+  .plane{position:absolute;top:16%;left:-18vw;width:80px;height:80px;
+    filter:drop-shadow(0 5px 10px rgba(60,110,150,.35));
+    animation:fly 28s linear infinite;animation-delay:-4s}
+  .plane.p2{top:52%;width:58px;height:58px;animation-duration:38s;animation-delay:-20s;opacity:.92}
+  .plane img{width:100%;height:100%;border-radius:18px;object-fit:cover;
+    box-shadow:0 2px 12px rgba(120,60,110,.28);background:rgba(255,255,255,.5)}
+  .plane::before{content:"";position:absolute;top:50%;right:100%;width:22vw;height:4px;transform:translateY(-50%);
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,210,232,.85));border-radius:4px}
+  @keyframes fly{from{transform:translate(0,0)}50%{transform:translate(60vw,-3vh)}to{transform:translate(134vw,2vh)}}
 
   /* 闪耀星光(JS 生成,彩色)*/
   .sparkle{position:absolute;animation:tw 3s ease-in-out infinite;user-select:none;text-shadow:0 0 6px currentColor}
@@ -237,7 +240,7 @@
     <div class="sun"></div>
     <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
     <div class="cloud c4"></div><div class="cloud c5"></div><div class="cloud c6"></div>
-    <div class="plane">✈️</div><div class="plane p2">✈️</div>
+    <div class="plane"><img alt="" decoding="async"></div><div class="plane p2"><img alt="" decoding="async"></div>
     <div id="sparkles"></div>
     <div id="petals"></div>
   </div>
@@ -580,6 +583,20 @@
     var tabs=document.getElementById('tabs');
     var PAGE_SIZE=12;   // 每页展示数量
     var gpage=0;
+
+    // 让两架"飞机"变成随机角色动图
+    (function(){
+      var imgs=document.querySelectorAll('.plane img');
+      if(!imgs.length || !GALLERY.length) return;
+      var used={};
+      Array.prototype.forEach.call(imgs,function(im){
+        var k=Math.floor(Math.random()*GALLERY.length), guard=0;
+        while(used[k] && guard++<GALLERY.length){ k=(k+1)%GALLERY.length; }
+        used[k]=1;
+        var item=GALLERY[k];
+        im.src=(item&&item.full)||(item&&item.thumb)||item;
+      });
+    })();
 
     // 视口内才加载完整动图(播放),离开视野换回静态缩略图(省资源)
     var galIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
