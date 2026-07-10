@@ -603,10 +603,11 @@
     var PAGE_SIZE=12;   // 每页展示数量
     var gpage=0;
 
-    // 背景角色:3 个,随机位置/大小/图片,淡入 -> 停留 5~8 秒 -> 淡出,循环
+    // 背景角色:点击背景任意位置生成(淡入 -> 移动 -> 淡出后自动消失),最多同时 3 个
     (function(){
       var box=document.getElementById('sprites');
       if(!box || !GALLERY.length) return;
+      var active=[];
       function rand(a,b){ return a+Math.random()*(b-a); }
       function pick(im){
         var k=Math.floor(Math.random()*GALLERY.length), g=0;
@@ -616,36 +617,31 @@
         im.fetchPriority='low';
         im.src=(item&&item.anim)||(item&&item.full)||(item&&item.thumb)||item;
       }
-      function spawn(sp){
-        var im=sp.firstChild;
-        pick(im);
-        var sz=Math.round(rand(72,130));
-        sp.style.width=sz+'px'; sp.style.height=sz+'px';
-        var side=Math.random()<.5?'left':'right';         // 随机选左边或右边
-        sp.style.left=(side==='left'?rand(1,12):rand(72,90)).toFixed(1)+'%';
-        sp.style.top=rand(14,42).toFixed(1)+'%';         // 随机竖直(远离顶栏与底部播放器)
-        var lifeMs=rand(5000,8000), lifeSec=lifeMs/1000; // 存在 5~8 秒
-        var dx=side==='left'?rand(1,6):rand(-6,-1);      // 向中间方向略移(不出中间)
-        var dy=rand(-3,3);
-        // 复位(无过渡),置于不可见起点
-        sp.style.transition='none';
-        sp.style.opacity='0';
-        sp.style.transform='translate(0,0)';
-        void sp.offsetWidth;                             // 强制回流,让复位立即生效
-        sp.style.transition='opacity .9s ease, transform '+lifeSec.toFixed(1)+'s ease-in-out';
-        requestAnimationFrame(function(){
-          sp.style.opacity='1';                          // 淡入
-          sp.style.transform='translate('+dx.toFixed(1)+'vw,'+dy.toFixed(1)+'vh)'; // 滑行
-        });
-        setTimeout(function(){ sp.style.opacity='0'; }, Math.max(2600, lifeMs-900)); // 末尾淡出
-        setTimeout(function(){ spawn(sp); }, lifeMs+200);                             // 换位重生
-      }
-      for(var i=0;i<3;i++){
+      function makeSprite(xPct,yPct){
+        if(active.length>=3){ var old=active.shift(); old.remove(); } // 最多 3 个,超了移除最早的
         var sp=document.createElement('div'); sp.className='sprite';
         sp.appendChild(document.createElement('img'));
         box.appendChild(sp);
-        (function(s,delay){ setTimeout(function(){ spawn(s); }, delay); })(sp, i*1700+Math.random()*900);
+        var side=xPct<50?'left':'right';
+        sp.style.left=(side==='left'?rand(1,12):rand(72,90)).toFixed(1)+'%';
+        sp.style.top=rand(14,42).toFixed(1)+'%';
+        var sz=Math.round(rand(72,130)); sp.style.width=sz+'px'; sp.style.height=sz+'px';
+        var im=sp.firstChild; pick(im);
+        var lifeMs=rand(5000,8000), lifeSec=lifeMs/1000;
+        var dx=side==='left'?rand(1,6):rand(-6,-1), dy=rand(-3,3);
+        sp.style.transition='none'; sp.style.opacity='0'; sp.style.transform='translate(0,0)';
+        void sp.offsetWidth;
+        sp.style.transition='opacity .9s ease, transform '+lifeSec.toFixed(1)+'s ease-in-out';
+        requestAnimationFrame(function(){ sp.style.opacity='1'; sp.style.transform='translate('+dx.toFixed(1)+'vw,'+dy.toFixed(1)+'vh)'; });
+        setTimeout(function(){ sp.style.opacity='0'; }, Math.max(2600, lifeMs-900));
+        setTimeout(function(){ sp.remove(); var i=active.indexOf(sp); if(i>=0) active.splice(i,1); }, lifeMs+1200);
+        active.push(sp);
       }
+      document.addEventListener('click',function(e){
+        var t=e.target;
+        if(t.closest('button')||t.closest('[role="button"]')||t.closest('.player')||t.closest('.controls')||t.closest('.lightbox')) return;
+        makeSprite(e.clientX/window.innerWidth*100, e.clientY/window.innerHeight*100);
+      });
     })();
 
     // 视口内才加载压缩动图(播放),离开视野换回静态缩略图(省资源)
