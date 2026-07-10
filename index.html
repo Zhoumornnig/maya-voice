@@ -525,33 +525,19 @@
     var tabs=document.getElementById('tabs');
     var galleryBuilt=false;
 
-    // 视口内才加载完整动图(播放),离开视野换回静态缩略图(省资源)
-    var galIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        var card=e.target, img=card.__img; if(!img) return;
-        var full=card.getAttribute('data-full'), thumb=card.getAttribute('data-thumb');
-        if(e.isIntersecting){ if(img.getAttribute('src')!==full) img.src=full; }
-        else { if(img.getAttribute('src')!==thumb) img.src=thumb; }
-      });
-    }, { rootMargin:'120px 0px' }) : null;
-
     function buildGallery(){
       if(galleryBuilt) return; galleryBuilt=true;
       var frag=document.createDocumentFragment();
       GALLERY.forEach(function(item,i){
-        var thumb=(item&&item.thumb)||(item&&item.full)||item;
-        var full=(item&&item.full)||thumb;
+        var full=(item&&item.full)||(item&&item.thumb)||item;
         var card=document.createElement('div'); card.className='gcard';
-        card.setAttribute('data-full',full); card.setAttribute('data-thumb',thumb);
         var img=document.createElement('img');
-        img.loading='lazy'; img.decoding='async'; img.src=thumb; img.alt='动图 '+(i+1);
-        card.__img=img;
+        img.loading='lazy'; img.decoding='async'; img.src=full; img.alt='动图 '+(i+1);
         card.appendChild(img);
         card.onclick=function(){ openLb(i); };
         frag.appendChild(card);
       });
       galleryView.appendChild(frag);
-      if(galIO){ Array.prototype.forEach.call(galleryView.children,function(c){ galIO.observe(c); }); }
     }
     function switchView(v){
       var g=(v==='gallery');
