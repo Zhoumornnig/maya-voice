@@ -19,44 +19,69 @@
   body{
     font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,-apple-system,sans-serif;
     color:var(--ink); overflow-x:hidden;
-    background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 42%,var(--sky-low) 100%);
+    background:linear-gradient(180deg,#7ec2f5 0%,#a9dbf7 32%,#d7ecfb 56%,#ffe4ef 82%,#fff5ec 100%);
     min-height:100%;
     padding-bottom:calc(var(--bar-h) + 20px);
   }
 
   /* ===== 动态天空背景 ===== */
   .sky{position:fixed;inset:0;z-index:-3;overflow:hidden;pointer-events:none}
-  .sun{position:absolute;top:8%;right:12%;width:170px;height:170px;border-radius:50%;
-    background:radial-gradient(circle,#fff7dd 0%,rgba(255,238,180,.65) 40%,rgba(255,238,180,0) 70%);
-    filter:blur(2px);animation:sunPulse 7s ease-in-out infinite}
-  @keyframes sunPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.08);opacity:1}}
+  /* 缓慢流动的色彩光晕 */
+  .sky::before{content:"";position:absolute;inset:-20%;
+    background:
+      radial-gradient(40% 40% at 78% 12%, rgba(255,247,214,.9), rgba(255,247,214,0) 60%),
+      radial-gradient(50% 40% at 14% 20%, rgba(180,225,255,.7), rgba(180,225,255,0) 60%),
+      radial-gradient(60% 50% at 50% 102%, rgba(255,200,224,.6), rgba(255,200,224,0) 60%);
+    animation:hue 24s ease-in-out infinite alternate}
+  @keyframes hue{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(0,-3%,0) scale(1.06)}}
 
-  .cloud{position:absolute;border-radius:100px;background:rgba(255,255,255,.85);filter:blur(6px);opacity:.85}
+  /* 太阳 + 光晕 */
+  .sun{position:absolute;top:7%;right:12%;width:150px;height:150px;border-radius:50%;
+    background:radial-gradient(circle,#fffbe9 0%,#fff2c4 34%,rgba(255,236,170,.5) 55%,rgba(255,236,170,0) 72%);
+    box-shadow:0 0 80px 30px rgba(255,240,190,.5);filter:blur(1px);animation:sunPulse 7s ease-in-out infinite}
+  @keyframes sunPulse{0%,100%{transform:scale(1);opacity:.92}50%{transform:scale(1.07);opacity:1}}
+
+  /* 云 */
+  .cloud{position:absolute;border-radius:100px;background:rgba(255,255,255,.9);filter:blur(7px)}
   .cloud::before,.cloud::after{content:"";position:absolute;background:inherit;border-radius:50%}
   .cloud::before{width:55%;height:150%;top:-55%;left:14%}
-  .cloud::after{width:38%;height:130%;top:-40%;right:16%}
-  .c1{width:220px;height:60px;top:16%;left:-260px;animation:drift 46s linear infinite}
-  .c2{width:320px;height:80px;top:38%;left:-380px;animation:drift 66s linear infinite;animation-delay:-14s;opacity:.7}
-  .c3{width:160px;height:46px;top:62%;left:-200px;animation:drift 38s linear infinite;animation-delay:-6s}
-  .c4{width:280px;height:70px;top:72%;left:-320px;animation:drift 58s linear infinite;animation-delay:-30s;opacity:.6}
-  .c5{width:200px;height:56px;top:26%;left:-240px;animation:drift 52s linear infinite;animation-delay:-40s;opacity:.75}
-  @keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 420px))}}
+  .cloud::after{width:40%;height:135%;top:-42%;right:15%}
+  .c1{width:220px;height:60px;top:14%;left:-260px;opacity:.9;animation:drift 48s linear infinite}
+  .c2{width:340px;height:84px;top:34%;left:-400px;opacity:.62;animation:drift 72s linear infinite;animation-delay:-16s}
+  .c3{width:150px;height:44px;top:60%;left:-200px;opacity:.85;animation:drift 40s linear infinite;animation-delay:-6s}
+  .c4{width:300px;height:74px;top:70%;left:-340px;opacity:.5;animation:drift 62s linear infinite;animation-delay:-32s}
+  .c5{width:200px;height:56px;top:24%;left:-240px;opacity:.72;animation:drift 54s linear infinite;animation-delay:-42s}
+  .c6{width:120px;height:36px;top:48%;left:-160px;opacity:.8;animation:drift 34s linear infinite;animation-delay:-22s}
+  @keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 440px))}}
 
   /* 飞机 + 尾迹 */
-  .plane{position:absolute;top:20%;left:-16vw;font-size:34px;filter:drop-shadow(0 3px 4px rgba(60,110,150,.35));
+  .plane{position:absolute;top:18%;left:-16vw;font-size:34px;filter:drop-shadow(0 3px 4px rgba(60,110,150,.35));
     animation:fly 26s linear infinite;animation-delay:-4s}
-  .plane.p2{top:56%;font-size:26px;animation-duration:34s;animation-delay:-20s;opacity:.85}
-  .plane::before{content:"";position:absolute;top:50%;right:100%;width:24vw;height:4px;transform:translateY(-50%);
-    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.85));border-radius:4px}
+  .plane.p2{top:54%;font-size:24px;animation-duration:36s;animation-delay:-20s;opacity:.8}
+  .plane::before{content:"";position:absolute;top:50%;right:100%;width:26vw;height:4px;transform:translateY(-50%);
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9));border-radius:4px}
   @keyframes fly{from{transform:translate(0,0)}50%{transform:translate(60vw,-3vh)}to{transform:translate(132vw,2vh)}}
 
-  /* 闪耀星光(JS 生成) */
-  .sparkle{position:absolute;color:#fff;text-shadow:0 0 6px rgba(255,240,190,.9);
-    animation:tw 3.2s ease-in-out infinite;user-select:none}
-  @keyframes tw{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:1;transform:scale(1.15)}}
+  /* 闪耀星光(JS 生成,彩色)*/
+  .sparkle{position:absolute;animation:tw 3s ease-in-out infinite;user-select:none;text-shadow:0 0 6px currentColor}
+  @keyframes tw{0%,100%{opacity:.12;transform:scale(.6)}50%{opacity:1;transform:scale(1.2)}}
+
+  /* 飘落樱花瓣(JS 生成)*/
+  .petal{position:absolute;top:-8%;border-radius:100% 0 100% 0;
+    background:linear-gradient(135deg,#ffd7e8,#ff9dc3);box-shadow:0 1px 2px rgba(255,120,170,.25)}
+  @keyframes fall{
+    0%{transform:translate(0,-12vh) rotate(0deg);opacity:0}
+    12%{opacity:.85}
+    100%{transform:translate(16vw,112vh) rotate(560deg);opacity:.6}}
+
+  /* 顶部柔光 + 底部暗角,增加层次 */
+  .vignette{position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:
+      radial-gradient(120% 80% at 50% 6%, rgba(255,255,255,.34), rgba(255,255,255,0) 42%),
+      radial-gradient(130% 100% at 50% 122%, rgba(70,120,160,.22), rgba(70,120,160,0) 55%)}
 
   @media (prefers-reduced-motion:reduce){
-    .cloud,.plane,.sparkle,.sun{animation:none}
+    .sky::before,.cloud,.plane,.sparkle,.sun,.petal{animation:none}
   }
 
   /* ===== 头部 ===== */
@@ -211,10 +236,12 @@
   <div class="sky" aria-hidden="true">
     <div class="sun"></div>
     <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
-    <div class="cloud c4"></div><div class="cloud c5"></div>
+    <div class="cloud c4"></div><div class="cloud c5"></div><div class="cloud c6"></div>
     <div class="plane">✈️</div><div class="plane p2">✈️</div>
     <div id="sparkles"></div>
+    <div id="petals"></div>
   </div>
+  <div class="vignette" aria-hidden="true"></div>
 
   <header>
     <h1 class="title">摩耶重炮 语音站</h1>
@@ -288,19 +315,36 @@
     var CATS = DATA.categories || [];
     var catMap = {}; CATS.forEach(function(c){catMap[c.key]=c;});
 
-    // ---- 闪耀星光 ----
+    // ---- 闪耀星光 + 飘落花瓣 ----
     (function(){
-      var box=document.getElementById('sparkles'); if(!box) return;
-      var glyphs=['✦','✧','·','✵','⋆'];
-      for(var i=0;i<34;i++){
-        var s=document.createElement('span'); s.className='sparkle';
-        s.textContent=glyphs[i%glyphs.length];
-        s.style.left=(Math.random()*100).toFixed(2)+'%';
-        s.style.top=(Math.random()*92).toFixed(2)+'%';
-        s.style.fontSize=(8+Math.random()*14).toFixed(0)+'px';
-        s.style.animationDelay=(-Math.random()*3.2).toFixed(2)+'s';
-        s.style.animationDuration=(2.4+Math.random()*2.4).toFixed(2)+'s';
-        box.appendChild(s);
+      var box=document.getElementById('sparkles');
+      if(box){
+        var glyphs=['✦','✧','·','✵','⋆','❋'];
+        var cols=['#fff6c9','#ffd9ea','#ffffff','#ffe6a8','#ffc6de'];
+        for(var i=0;i<30;i++){
+          var s=document.createElement('span'); s.className='sparkle';
+          s.textContent=glyphs[i%glyphs.length];
+          s.style.color=cols[i%cols.length];
+          s.style.left=(Math.random()*100).toFixed(2)+'%';
+          s.style.top=(Math.random()*94).toFixed(2)+'%';
+          s.style.fontSize=(8+Math.random()*14).toFixed(0)+'px';
+          s.style.animationDelay=(-Math.random()*3).toFixed(2)+'s';
+          s.style.animationDuration=(2.2+Math.random()*2.6).toFixed(2)+'s';
+          box.appendChild(s);
+        }
+      }
+      var pbox=document.getElementById('petals');
+      if(pbox){
+        for(var j=0;j<16;j++){
+          var p=document.createElement('span'); p.className='petal';
+          var sz=(9+Math.random()*10).toFixed(0);
+          p.style.left=(Math.random()*100).toFixed(2)+'%';
+          p.style.width=sz+'px'; p.style.height=sz+'px';
+          p.style.opacity=(0.5+Math.random()*0.4).toFixed(2);
+          p.style.animation='fall '+(9+Math.random()*9).toFixed(1)+'s linear infinite';
+          p.style.animationDelay=(-Math.random()*12).toFixed(1)+'s';
+          pbox.appendChild(p);
+        }
       }
     })();
 
