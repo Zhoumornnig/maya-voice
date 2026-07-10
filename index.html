@@ -170,7 +170,10 @@
   @media (max-width:520px){ .lb-btn{width:40px;height:40px;font-size:18px} .gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} }
 
   /* ===== 分页 ===== */
-  .pager{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;max-width:1120px;margin:22px auto 0;padding:0 20px}
+  .pager{display:flex;justify-content:center;flex-wrap:wrap;align-items:center;gap:8px;max-width:1120px;margin:10px auto 0;padding:0 20px}
+  .pager .jump{width:44px;height:34px;border:0;border-radius:10px;text-align:center;font-size:13px;font-weight:800;
+    background:rgba(255,255,255,.82);color:var(--ink);box-shadow:var(--shadow);outline:0}
+  .pager .jump:focus{box-shadow:0 0 0 2px var(--pink)}
   .pgbtn{min-width:38px;height:38px;border:0;cursor:pointer;border-radius:11px;padding:0 12px;font-size:14px;font-weight:800;
     background:rgba(255,255,255,.82);color:var(--ink);box-shadow:var(--shadow);transition:.15s}
   .pgbtn:hover:not(:disabled){transform:translateY(-1px);color:var(--pink)}
@@ -600,7 +603,7 @@
     var galleryView=document.getElementById('galleryView');
     var pager=document.getElementById('pager');
     var tabs=document.getElementById('tabs');
-    var PAGE_SIZE=12;   // 每页展示数量
+    var PAGE_SIZE=10;   // 每页展示数量
     var gpage=0;
 
     // 背景角色:点击背景任意位置生成(淡入 -> 移动 -> 淡出后自动消失),最多同时 3 个
@@ -711,6 +714,11 @@
         else pager.appendChild(mk(String(n+1),n,n===gpage?' on':''));
       });
       pager.appendChild(mk('›',gpage+1,'',gpage===pages-1));
+      // 输入跳转
+      var inp=document.createElement('input'); inp.className='jump'; inp.type='number'; inp.min=1; inp.max=pages;
+      inp.placeholder=''; inp.title='输入页码后回车跳转';
+      inp.onkeydown=function(ev){ if(ev.key==='Enter'){ var v=parseInt(inp.value,10); if(v>=1&&v<=pages) renderGalleryPage(v-1); } };
+      pager.appendChild(inp);
     }
     function switchView(v){
       var g=(v==='gallery');
