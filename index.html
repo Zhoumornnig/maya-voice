@@ -59,8 +59,7 @@
     filter:drop-shadow(0 5px 10px rgba(60,110,150,.35));
     animation:fly 28s linear infinite;animation-delay:-4s}
   .plane.p2{top:52%;width:58px;height:58px;animation-duration:38s;animation-delay:-20s;opacity:.92}
-  .plane img{width:100%;height:100%;border-radius:18px;object-fit:cover;
-    box-shadow:0 2px 12px rgba(120,60,110,.28);background:rgba(255,255,255,.5)}
+  .plane img{width:100%;height:100%;object-fit:contain;display:block}
   .plane::before{content:"";position:absolute;top:50%;right:100%;width:22vw;height:4px;transform:translateY(-50%);
     background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,210,232,.85));border-radius:4px}
   @keyframes fly{from{transform:translate(0,0)}50%{transform:translate(60vw,-3vh)}to{transform:translate(134vw,2vh)}}
