@@ -55,15 +55,11 @@
   .c6{width:120px;height:36px;top:48%;left:-160px;opacity:.8;animation:drift 34s linear infinite;animation-delay:-22s}
   @keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 440px))}}
 
-  /* 飞过的角色动图 + 尾迹 */
-  .plane{position:absolute;top:16%;left:-18vw;width:80px;height:80px;
-    filter:drop-shadow(0 5px 10px rgba(60,110,150,.35));
-    animation:fly 28s linear infinite;animation-delay:-4s}
-  .plane.p2{top:52%;width:58px;height:58px;animation-duration:38s;animation-delay:-20s;opacity:.92}
-  .plane img{width:100%;height:100%;object-fit:contain;display:block}
-  .plane::before{content:"";position:absolute;top:50%;right:100%;width:22vw;height:4px;transform:translateY(-50%);
-    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,210,232,.85));border-radius:4px}
-  @keyframes fly{from{transform:translate(0,0)}50%{transform:translate(60vw,-3vh)}to{transform:translate(134vw,2vh)}}
+  /* 随机出现/消失的角色动图(淡入停留淡出)*/
+  .sprite{position:absolute;opacity:0;transition:opacity .9s ease;pointer-events:none;
+    filter:drop-shadow(0 5px 10px rgba(60,110,150,.35));animation:floaty 4.5s ease-in-out infinite}
+  .sprite img{width:100%;height:100%;object-fit:contain;display:block}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
   /* 闪耀星光(JS 生成,彩色)*/
   .sparkle{position:absolute;animation:tw 3s ease-in-out infinite;user-select:none;text-shadow:0 0 6px currentColor}
@@ -84,7 +80,7 @@
       radial-gradient(130% 100% at 50% 122%, rgba(70,120,160,.22), rgba(70,120,160,0) 55%)}
 
   @media (prefers-reduced-motion:reduce){
-    .sky::before,.cloud,.plane,.sparkle,.sun,.petal{animation:none}
+    .sky::before,.cloud,.sprite,.sparkle,.sun,.petal{animation:none}
   }
 
   /* ===== 头部 ===== */
@@ -240,9 +236,9 @@
     <div class="sun"></div>
     <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
     <div class="cloud c4"></div><div class="cloud c5"></div><div class="cloud c6"></div>
-    <div class="plane"><img alt="" decoding="async"></div><div class="plane p2"><img alt="" decoding="async"></div>
     <div id="sparkles"></div>
     <div id="petals"></div>
+    <div id="sprites"></div>
   </div>
   <div class="vignette" aria-hidden="true"></div>
 
@@ -607,10 +603,10 @@
     var PAGE_SIZE=12;   // 每页展示数量
     var gpage=0;
 
-    // 背景飞过的小人:每飞完一轮随机换图 + 随机位置/大小(合理范围),常看常新
+    // 背景角色:3 个,随机位置/大小/图片,淡入 -> 停留 5~8 秒 -> 淡出,循环
     (function(){
-      var planes=document.querySelectorAll('.plane');
-      if(!planes.length || !GALLERY.length) return;
+      var box=document.getElementById('sprites');
+      if(!box || !GALLERY.length) return;
       function rand(a,b){ return a+Math.random()*(b-a); }
       function pick(im){
         var k=Math.floor(Math.random()*GALLERY.length), g=0;
@@ -620,17 +616,28 @@
         im.fetchPriority='low';
         im.src=(item&&item.anim)||(item&&item.full)||(item&&item.thumb)||item;
       }
-      function respawn(pl, im){
-        pl.style.top=rand(6,70).toFixed(1)+'%';        // 竖直位置(避开顶栏与底部播放器)
-        var sz=Math.round(rand(46,100));               // 大小(合理范围)
-        pl.style.width=sz+'px'; pl.style.height=sz+'px';
+      function spawn(sp){
+        var im=sp.firstChild;
         pick(im);
+        var sz=Math.round(rand(56,112));
+        sp.style.width=sz+'px'; sp.style.height=sz+'px';
+        sp.style.left=rand(3,82).toFixed(1)+'%';        // 随机水平位置(不一定从最左)
+        sp.style.top=rand(6,70).toFixed(1)+'%';         // 随机竖直位置(避开顶栏/播放器)
+        sp.style.animationDelay=(-rand(0,4.5)).toFixed(2)+'s'; // 错开漂浮相位
+        sp.style.opacity='0';
+        requestAnimationFrame(function(){ requestAnimationFrame(function(){ sp.style.opacity='1'; }); }); // 淡入
+        var life=rand(5000,8000);                        // 存在 5~8 秒
+        setTimeout(function(){
+          sp.style.opacity='0';                          // 淡出
+          setTimeout(function(){ spawn(sp); }, 1000);    // 淡出结束后换位重生
+        }, life);
       }
-      Array.prototype.forEach.call(planes,function(pl){
-        var im=pl.querySelector('img'); if(!im) return;
-        respawn(pl, im);
-        pl.addEventListener('animationiteration',function(){ respawn(pl, im); });
-      });
+      for(var i=0;i<3;i++){
+        var sp=document.createElement('div'); sp.className='sprite';
+        sp.appendChild(document.createElement('img'));
+        box.appendChild(sp);
+        (function(s,delay){ setTimeout(function(){ spawn(s); }, delay); })(sp, i*1700+Math.random()*900);
+      }
     })();
 
     // 视口内才加载压缩动图(播放),离开视野换回静态缩略图(省资源)
