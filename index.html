@@ -623,21 +623,27 @@
         sp.appendChild(document.createElement('img'));
         box.appendChild(sp);
         var sz=Math.round(rand(72,130)); sp.style.width=sz+'px'; sp.style.height=sz+'px';
-        // 纯像素定位:以点击点居中,限制不超出屏幕
         var x=Math.round(cx-sz/2); x=Math.max(4,Math.min(window.innerWidth-sz-4,x));
         var y=Math.round(cy-sz/2); y=Math.max(4,Math.min(window.innerHeight-sz-4,y));
         sp.style.left=x+'px'; sp.style.top=y+'px';
         var im=sp.firstChild; pick(im);
         var lifeMs=rand(5000,8000), lifeSec=lifeMs/1000;
-        var dx=rand(-50,50), dy=rand(-40,40);            // 像素级轻缓滑行
+        var dx=rand(-50,50), dy=rand(-40,40);
         sp.style.transition='none'; sp.style.opacity='0'; sp.style.transform='translate(0,0)';
         void sp.offsetWidth;
         sp.style.transition='opacity .9s ease, transform '+lifeSec.toFixed(1)+'s ease-in-out';
         requestAnimationFrame(function(){ sp.style.opacity='1'; sp.style.transform='translate('+dx.toFixed(0)+'px,'+dy.toFixed(0)+'px)'; });
         setTimeout(function(){ sp.style.opacity='0'; }, Math.max(2600, lifeMs-900));
-        setTimeout(function(){ sp.remove(); var i=active.indexOf(sp); if(i>=0) active.splice(i,1); }, lifeMs+1200);
+        var cleanup=function(){
+          sp.remove(); var i=active.indexOf(sp); if(i>=0) active.splice(i,1);
+          if(active.length<3) makeSprite(rand(80, window.innerWidth-80), rand(60, window.innerHeight-100));
+        };
+        setTimeout(cleanup, lifeMs+1200);
         active.push(sp);
       }
+      // 自动化:保持背景始终有 3 个
+      function autoFill(){ while(active.length<3){ makeSprite(rand(80, window.innerWidth-80), rand(60, window.innerHeight-100)); } }
+      autoFill();
       document.addEventListener('click',function(e){
         var t=e.target;
         if(t.closest('button')||t.closest('[role="button"]')||t.closest('.player')||t.closest('.controls')||t.closest('.lightbox')) return;
