@@ -607,18 +607,22 @@
     var PAGE_SIZE=12;   // 每页展示数量
     var gpage=0;
 
-    // 让两架"飞机"变成随机角色动图
+    // 背景飞过的小人:随机取图,且每飞完一轮(飞到屏幕外时)随机换一张,常看常新
     (function(){
-      var imgs=document.querySelectorAll('.plane img');
-      if(!imgs.length || !GALLERY.length) return;
-      var used={};
-      Array.prototype.forEach.call(imgs,function(im){
-        var k=Math.floor(Math.random()*GALLERY.length), guard=0;
-        while(used[k] && guard++<GALLERY.length){ k=(k+1)%GALLERY.length; }
-        used[k]=1;
+      var planes=document.querySelectorAll('.plane');
+      if(!planes.length || !GALLERY.length) return;
+      function pick(im){
+        var k=Math.floor(Math.random()*GALLERY.length), g=0;
+        while(GALLERY.length>1 && k===im.__last && g++<8){ k=Math.floor(Math.random()*GALLERY.length); }
+        im.__last=k;
         var item=GALLERY[k];
         im.fetchPriority='low';
         im.src=(item&&item.anim)||(item&&item.full)||(item&&item.thumb)||item;
+      }
+      Array.prototype.forEach.call(planes,function(pl){
+        var im=pl.querySelector('img'); if(!im) return;
+        pick(im);
+        pl.addEventListener('animationiteration',function(){ pick(im); });
       });
     })();
 
