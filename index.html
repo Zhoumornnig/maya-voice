@@ -622,13 +622,14 @@
         var sp=document.createElement('div'); sp.className='sprite';
         sp.appendChild(document.createElement('img'));
         box.appendChild(sp);
-        var side=xPct<50?'left':'right';
-        sp.style.left=(side==='left'?rand(1,12):rand(72,90)).toFixed(1)+'%';
-        sp.style.top=rand(14,42).toFixed(1)+'%';
         var sz=Math.round(rand(72,130)); sp.style.width=sz+'px'; sp.style.height=sz+'px';
+        // 以点击点为中心,限制在安全范围内
+        var safetyW=sz/window.innerWidth*100;
+        sp.style.left=Math.max(2,Math.min(98-safetyW, xPct-safetyW/2)).toFixed(1)+'%';
+        sp.style.top =Math.max(8,Math.min(78, yPct)).toFixed(1)+'%';
         var im=sp.firstChild; pick(im);
         var lifeMs=rand(5000,8000), lifeSec=lifeMs/1000;
-        var dx=side==='left'?rand(1,6):rand(-6,-1), dy=rand(-3,3);
+        var dx=rand(-4,4), dy=rand(-3,3);               // 任意方向轻缓滑行
         sp.style.transition='none'; sp.style.opacity='0'; sp.style.transform='translate(0,0)';
         void sp.offsetWidth;
         sp.style.transition='opacity .9s ease, transform '+lifeSec.toFixed(1)+'s ease-in-out';
