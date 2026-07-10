@@ -17,8 +17,8 @@ for (const f of files) {
   const out = path.join(ANIM, f);
   if (fs.existsSync(out)) { skip++; continue; }          // 幂等
   await sharp(path.join(GAL, f), { animated: true })      // 读取全部帧(保留动画)
-    .resize({ width: 200, withoutEnlargement: true })
-    .webp({ quality: 38, effort: 5 })
+    .resize({ width: 176, withoutEnlargement: true })
+    .webp({ quality: 32, alphaQuality: 45, smartSubsample: true, effort: 6 })
     .toFile(out);
   made++;
 }
