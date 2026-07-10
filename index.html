@@ -610,7 +610,7 @@
     (function(){
       var box=document.getElementById('sprites');
       if(!box || !GALLERY.length) return;
-      var active=[];
+      var active=[], paused=false;
       function rand(a,b){ return a+Math.random()*(b-a); }
       function pick(im){
         var k=Math.floor(Math.random()*GALLERY.length), g=0;
@@ -621,6 +621,7 @@
         im.src=(item&&item.anim)||(item&&item.full)||(item&&item.thumb)||item;
       }
       function makeSprite(cx,cy){
+        if(paused) return;
         if(active.length>=3){ var old=active.shift(); old.remove(); }
         var sp=document.createElement('div'); sp.className='sprite';
         sp.appendChild(document.createElement('img'));
@@ -639,19 +640,22 @@
         setTimeout(function(){ sp.style.opacity='0'; }, Math.max(2600, lifeMs-900));
         var cleanup=function(){
           sp.remove(); var i=active.indexOf(sp); if(i>=0) active.splice(i,1);
-          if(active.length<3) makeSprite(rand(80, window.innerWidth-80), rand(60, window.innerHeight-100));
+          if(!paused && active.length<3) makeSprite(rand(80, window.innerWidth-80), rand(60, window.innerHeight-100));
         };
         setTimeout(cleanup, lifeMs+1200);
         active.push(sp);
       }
-      // 自动化:保持背景始终有 3 个
       function autoFill(){ while(active.length<3){ makeSprite(rand(80, window.innerWidth-80), rand(60, window.innerHeight-100)); } }
       autoFill();
       document.addEventListener('click',function(e){
+        if(paused) return;
         var t=e.target;
         if(t.closest('button')||t.closest('[role="button"]')||t.closest('.player')||t.closest('.controls')||t.closest('.lightbox')) return;
         makeSprite(e.clientX, e.clientY);
       });
+      // 供 switchView 调用
+      window._spritesPause=function(){ paused=true; while(active.length){ active[0].remove(); active.shift(); } };
+      window._spritesResume=function(){ paused=false; autoFill(); };
     })();
 
     // 视口内才加载压缩动图(播放),离开视野换回静态缩略图(省资源)
@@ -727,7 +731,8 @@
       controls.style.display=g?'none':'';
       galleryView.style.display=g?'':'none';
       pager.style.display=g?'':'none';
-      if(g) renderGalleryPage(gpage);
+      if(g){ renderGalleryPage(gpage); window._spritesPause&&window._spritesPause(); }
+      else { window._spritesResume&&window._spritesResume(); }
       window.scrollTo({top:0,behavior:'smooth'});
     }
     Array.prototype.forEach.call(tabs.children,function(b){ b.onclick=function(){ switchView(b.dataset.view); }; });
