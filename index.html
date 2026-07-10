@@ -55,11 +55,11 @@
   .c6{width:120px;height:36px;top:48%;left:-160px;opacity:.8;animation:drift 34s linear infinite;animation-delay:-22s}
   @keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 440px))}}
 
-  /* 随机出现/消失的角色动图(淡入停留淡出)*/
-  .sprite{position:absolute;opacity:0;transition:opacity .9s ease;pointer-events:none;
-    filter:drop-shadow(0 5px 10px rgba(60,110,150,.35));animation:floaty 4.5s ease-in-out infinite}
-  .sprite img{width:100%;height:100%;object-fit:contain;display:block}
-  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  /* 随机出现/移动/消失的角色动图 */
+  .sprite{position:absolute;opacity:0;pointer-events:none;will-change:transform,opacity;
+    filter:drop-shadow(0 5px 10px rgba(60,110,150,.35))}
+  .sprite img{width:100%;height:100%;object-fit:contain;display:block;animation:floaty 4.5s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 
   /* 闪耀星光(JS 生成,彩色)*/
   .sparkle{position:absolute;animation:tw 3s ease-in-out infinite;user-select:none;text-shadow:0 0 6px currentColor}
@@ -621,16 +621,22 @@
         pick(im);
         var sz=Math.round(rand(56,112));
         sp.style.width=sz+'px'; sp.style.height=sz+'px';
-        sp.style.left=rand(3,82).toFixed(1)+'%';        // 随机水平位置(不一定从最左)
-        sp.style.top=rand(6,70).toFixed(1)+'%';         // 随机竖直位置(避开顶栏/播放器)
-        sp.style.animationDelay=(-rand(0,4.5)).toFixed(2)+'s'; // 错开漂浮相位
+        sp.style.left=rand(4,78).toFixed(1)+'%';        // 随机水平位置(不一定从最左)
+        sp.style.top=rand(8,64).toFixed(1)+'%';         // 随机竖直位置(避开顶栏/播放器)
+        var lifeMs=rand(5000,8000), lifeSec=lifeMs/1000; // 存在 5~8 秒
+        var dx=rand(-12,12), dy=rand(-8,8);             // 生命周期内滑行的方向/距离
+        // 复位(无过渡),置于不可见起点
+        sp.style.transition='none';
         sp.style.opacity='0';
-        requestAnimationFrame(function(){ requestAnimationFrame(function(){ sp.style.opacity='1'; }); }); // 淡入
-        var life=rand(5000,8000);                        // 存在 5~8 秒
-        setTimeout(function(){
-          sp.style.opacity='0';                          // 淡出
-          setTimeout(function(){ spawn(sp); }, 1000);    // 淡出结束后换位重生
-        }, life);
+        sp.style.transform='translate(0,0)';
+        void sp.offsetWidth;                             // 强制回流,让复位立即生效
+        sp.style.transition='opacity .9s ease, transform '+lifeSec.toFixed(1)+'s ease-in-out';
+        requestAnimationFrame(function(){
+          sp.style.opacity='1';                          // 淡入
+          sp.style.transform='translate('+dx.toFixed(1)+'vw,'+dy.toFixed(1)+'vh)'; // 滑行
+        });
+        setTimeout(function(){ sp.style.opacity='0'; }, Math.max(2600, lifeMs-900)); // 末尾淡出
+        setTimeout(function(){ spawn(sp); }, lifeMs+200);                             // 换位重生
       }
       for(var i=0;i<3;i++){
         var sp=document.createElement('div'); sp.className='sprite';
