@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>摩耶重炮 语音站 · マヤノトップガン</title>
+<meta name="description" content="摩耶重炮(マヤノトップガン)角色语音收藏,自由选择播放。" />
+<style>
+  :root{
+    --sky-top:#7ec8f5; --sky-mid:#a9dbf7; --sky-low:#e9f6ff;
+    --ink:#233b53; --ink-soft:#5b7793;
+    --card:rgba(255,255,255,.72); --card-brd:rgba(255,255,255,.9);
+    --pink:#ff85b3; --gold:#ffcf5c;
+    --shadow:0 8px 24px rgba(48,96,140,.16);
+    --bar-h:96px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,-apple-system,sans-serif;
+    color:var(--ink); overflow-x:hidden;
+    background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 42%,var(--sky-low) 100%);
+    min-height:100%;
+    padding-bottom:calc(var(--bar-h) + 20px);
+  }
+
+  /* ===== 动态天空背景 ===== */
+  .sky{position:fixed;inset:0;z-index:-3;overflow:hidden;pointer-events:none}
+  .sun{position:absolute;top:8%;right:12%;width:170px;height:170px;border-radius:50%;
+    background:radial-gradient(circle,#fff7dd 0%,rgba(255,238,180,.65) 40%,rgba(255,238,180,0) 70%);
+    filter:blur(2px);animation:sunPulse 7s ease-in-out infinite}
+  @keyframes sunPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.08);opacity:1}}
+
+  .cloud{position:absolute;border-radius:100px;background:rgba(255,255,255,.85);filter:blur(6px);opacity:.85}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:inherit;border-radius:50%}
+  .cloud::before{width:55%;height:150%;top:-55%;left:14%}
+  .cloud::after{width:38%;height:130%;top:-40%;right:16%}
+  .c1{width:220px;height:60px;top:16%;left:-260px;animation:drift 46s linear infinite}
+  .c2{width:320px;height:80px;top:38%;left:-380px;animation:drift 66s linear infinite;animation-delay:-14s;opacity:.7}
+  .c3{width:160px;height:46px;top:62%;left:-200px;animation:drift 38s linear infinite;animation-delay:-6s}
+  .c4{width:280px;height:70px;top:72%;left:-320px;animation:drift 58s linear infinite;animation-delay:-30s;opacity:.6}
+  .c5{width:200px;height:56px;top:26%;left:-240px;animation:drift 52s linear infinite;animation-delay:-40s;opacity:.75}
+  @keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 420px))}}
+
+  /* 飞机 + 尾迹 */
+  .plane{position:absolute;top:20%;left:-16vw;font-size:34px;filter:drop-shadow(0 3px 4px rgba(60,110,150,.35));
+    animation:fly 26s linear infinite;animation-delay:-4s}
+  .plane.p2{top:56%;font-size:26px;animation-duration:34s;animation-delay:-20s;opacity:.85}
+  .plane::before{content:"";position:absolute;top:50%;right:100%;width:24vw;height:4px;transform:translateY(-50%);
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.85));border-radius:4px}
+  @keyframes fly{from{transform:translate(0,0)}50%{transform:translate(60vw,-3vh)}to{transform:translate(132vw,2vh)}}
+
+  /* 闪耀星光(JS 生成) */
+  .sparkle{position:absolute;color:#fff;text-shadow:0 0 6px rgba(255,240,190,.9);
+    animation:tw 3.2s ease-in-out infinite;user-select:none}
+  @keyframes tw{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:1;transform:scale(1.15)}}
+
+  @media (prefers-reduced-motion:reduce){
+    .cloud,.plane,.sparkle,.sun{animation:none}
+  }
+
+  /* ===== 头部 ===== */
+  header{max-width:1120px;margin:0 auto;padding:38px 20px 6px;text-align:center}
+  .title{font-size:clamp(30px,5.5vw,52px);font-weight:800;letter-spacing:1px;margin:0;
+    color:#fff;text-shadow:0 3px 0 rgba(255,133,179,.55),0 6px 18px rgba(40,90,140,.35)}
+  .subtitle{margin:8px 0 0;color:#f4fbff;font-size:15px;letter-spacing:2px;opacity:.95;
+    text-shadow:0 2px 8px rgba(40,90,140,.35)}
+  .count{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:5px 14px;border-radius:999px;
+    background:rgba(255,255,255,.85);color:var(--ink);font-size:13px;font-weight:700;box-shadow:var(--shadow)}
+
+  /* ===== 控制区 ===== */
+  .controls{max-width:1120px;margin:18px auto 0;padding:0 20px;position:sticky;top:0;z-index:20}
+  .controls-inner{background:rgba(255,255,255,.66);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid var(--card-brd);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px}
+  .searchrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .search{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;
+    padding:9px 14px;box-shadow:inset 0 0 0 1px rgba(120,170,210,.3)}
+  .search input{border:0;outline:0;flex:1;font-size:15px;color:var(--ink);background:transparent}
+  .search input::placeholder{color:#9fb6cc}
+  .btn{border:0;cursor:pointer;border-radius:12px;padding:9px 14px;font-size:14px;font-weight:700;
+    background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px rgba(120,170,210,.3);transition:.15s}
+  .btn:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px var(--pink),0 4px 10px rgba(255,133,179,.25)}
+  .btn.on{background:linear-gradient(135deg,var(--pink),#ff9ec3);color:#fff;box-shadow:0 4px 12px rgba(255,133,179,.4)}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .chip{cursor:pointer;border:0;border-radius:999px;padding:6px 13px;font-size:13px;font-weight:700;
+    background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px rgba(120,170,210,.25);transition:.15s;
+    display:inline-flex;align-items:center;gap:6px}
+  .chip .dot{width:9px;height:9px;border-radius:50%}
+  .chip .n{font-size:11px;opacity:.6;font-weight:600}
+  .chip:hover{transform:translateY(-1px)}
+  .chip.on{color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+
+  /* ===== 卡片网格 ===== */
+  main{max-width:1120px;margin:18px auto 0;padding:0 20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+  .card{position:relative;text-align:left;cursor:pointer;border:1px solid var(--card-brd);
+    background:var(--card);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border-radius:16px;padding:16px 16px 16px 20px;box-shadow:var(--shadow);transition:.16s;overflow:hidden;
+    scroll-margin:110px 0 160px}
+  @keyframes locate{0%{box-shadow:0 0 0 2px var(--pink),0 0 0 8px rgba(255,133,179,.35)}
+    100%{box-shadow:0 0 0 2px var(--pink),0 14px 30px rgba(255,133,179,.3)}}
+  .card.playing.locate{animation:locate .7s ease-out}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--cc,#7dd3fc)}
+  .card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(48,96,140,.22)}
+  .card.playing{box-shadow:0 0 0 2px var(--pink),0 14px 30px rgba(255,133,179,.3)}
+  .card .cn{font-size:15.5px;font-weight:700;line-height:1.5;color:var(--ink);margin:0 0 8px}
+  .card .jp{font-size:12.5px;line-height:1.45;color:var(--ink-soft);margin:0}
+  .card .meta{display:flex;align-items:center;gap:8px;margin-top:12px}
+  .tag{font-size:11px;font-weight:700;color:#fff;padding:2px 9px;border-radius:999px}
+  .card .play{margin-left:auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:#fff;box-shadow:var(--shadow);color:var(--pink);font-size:14px}
+  .card.playing .play{background:linear-gradient(135deg,var(--pink),#ff9ec3);color:#fff}
+  .empty{text-align:center;color:#5b7793;padding:60px 0;font-size:15px}
+
+  /* ===== 悬浮播放器(可拖动 / 可收起) ===== */
+  .player{position:fixed;z-index:30;left:50%;bottom:22px;transform:translateX(-50%);
+    width:min(1040px,calc(100vw - 32px));
+    background:rgba(255,255,255,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid var(--card-brd);border-radius:20px;
+    box-shadow:0 12px 34px rgba(48,96,140,.24);transition:box-shadow .2s,width .18s}
+  .player.free{transform:none}                 /* 拖动后改用 left/top 定位 */
+  .player.dragging{transition:none;box-shadow:0 18px 46px rgba(48,96,140,.38)}
+  .player-inner{padding:12px 14px;display:flex;align-items:center;gap:12px}
+
+  .grip{flex:0 0 auto;width:28px;height:40px;border:0;border-radius:10px;cursor:grab;
+    background:rgba(120,170,210,.15);color:#7c9bb8;display:grid;place-items:center;
+    font-size:18px;letter-spacing:1px;line-height:1;touch-action:none;user-select:none}
+  .grip:hover{background:rgba(255,133,179,.18);color:var(--pink)}
+  .grip:active{cursor:grabbing}
+
+  .np{min-width:0;flex:1}
+  .np .ncn{font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .np .njp{font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+  .np .njp.empty-hint{color:#9fb6cc}
+  .pbtns{display:flex;align-items:center;gap:8px}
+  .ctrl{width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;background:#fff;color:var(--ink);
+    box-shadow:var(--shadow);display:grid;place-items:center;font-size:16px;transition:.15s}
+  .ctrl:hover{transform:translateY(-1px);color:var(--pink)}
+  .ctrl.big{width:52px;height:52px;font-size:20px;background:linear-gradient(135deg,var(--pink),#ff9ec3);color:#fff}
+  .ctrl.small{width:34px;height:34px;font-size:13px}
+  .ctrl.toggle.on{color:var(--pink);box-shadow:inset 0 0 0 2px var(--pink)}
+  .seekwrap{flex:2;min-width:120px;display:flex;align-items:center;gap:10px}
+  .time{font-size:11px;color:var(--ink-soft);font-variant-numeric:tabular-nums;min-width:34px;text-align:center}
+  .seek{flex:1;height:6px;border-radius:6px;background:rgba(120,170,210,.28);position:relative;cursor:pointer}
+  .seek .fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;
+    background:linear-gradient(90deg,var(--gold),var(--pink));width:0%}
+  .seek .knob{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:#fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);transform:translate(-50%,-50%);left:0%}
+
+  /* 收起态:仅保留 拖动 / 收展 / 上一条 / 播放 / 下一条 */
+  .player.collapsed{width:auto}
+  .player.collapsed .np,
+  .player.collapsed .seekwrap,
+  .player.collapsed #shuffle,
+  .player.collapsed #autonext{display:none}
+
+  @media (max-width:720px){
+    .player{width:calc(100vw - 20px);bottom:12px}
+    .player-inner{flex-wrap:wrap;gap:8px 10px}
+    .grip{order:1}#collapse{order:2}
+    .np{order:3;flex-basis:calc(100% - 84px)}
+    .pbtns{order:4}.seekwrap{order:5;flex-basis:100%}
+    .player.collapsed .np{display:none}
+  }
+</style>
+</head>
+<body>
+  <!-- 动态天空 -->
+  <div class="sky" aria-hidden="true">
+    <div class="sun"></div>
+    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+    <div class="cloud c4"></div><div class="cloud c5"></div>
+    <div class="plane">✈️</div><div class="plane p2">✈️</div>
+    <div id="sparkles"></div>
+  </div>
+
+  <header>
+    <h1 class="title">摩耶重炮 语音站</h1>
+    <p class="subtitle">マヤノトップガン ボイスコレクション</p>
+    <div><span class="count" id="count">✈ 共 0 条语音</span></div>
+  </header>
+
+  <div class="controls">
+    <div class="controls-inner">
+      <div class="searchrow">
+        <label class="search">
+          <span>🔍</span>
+          <input id="search" type="search" placeholder="搜索中文或日文台词…" autocomplete="off" />
+        </label>
+        <button class="btn" id="shuffleAll">🎲 随机播放</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+
+  <main>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" style="display:none">没有匹配的语音,换个关键词试试~</div>
+  </main>
+
+  <!-- 播放器(可拖动 / 可收起) -->
+  <div class="player" id="player">
+    <div class="player-inner">
+      <button class="grip" id="grip" title="按住拖动播放器" aria-label="拖动播放器">⠿</button>
+      <button class="ctrl small" id="collapse" title="收起 / 展开" aria-label="收起或展开">▾</button>
+      <div class="np">
+        <div class="ncn" id="npCn">点一条语音开始播放 ✧</div>
+        <div class="njp empty-hint" id="npJp">摩耶,随时准备起飞!</div>
+      </div>
+      <div class="pbtns">
+        <button class="ctrl" id="prev" title="上一条 (←)" aria-label="上一条">⏮</button>
+        <button class="ctrl big" id="playpause" title="播放/暂停 (空格)" aria-label="播放或暂停">▶</button>
+        <button class="ctrl" id="next" title="下一条 (→)" aria-label="下一条">⏭</button>
+        <button class="ctrl toggle" id="shuffle" title="随机" aria-label="随机">🔀</button>
+        <button class="ctrl toggle on" id="autonext" title="自动播放下一条" aria-label="自动播放下一条">↻</button>
+      </div>
+      <div class="seekwrap">
+        <span class="time" id="cur">0:00</span>
+        <div class="seek" id="seek"><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
+        <span class="time" id="dur">0:00</span>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio" preload="none"></audio>
+  <script src="data.js"></script>
+  <script>
+  (function(){
+    var DATA = window.MAYA_DATA || {clips:[],categories:[]};
+    var CLIPS = DATA.clips || [];
+    var CATS = DATA.categories || [];
+    var catMap = {}; CATS.forEach(function(c){catMap[c.key]=c;});
+
+    // ---- 闪耀星光 ----
+    (function(){
+      var box=document.getElementById('sparkles'); if(!box) return;
+      var glyphs=['✦','✧','·','✵','⋆'];
+      for(var i=0;i<34;i++){
+        var s=document.createElement('span'); s.className='sparkle';
+        s.textContent=glyphs[i%glyphs.length];
+        s.style.left=(Math.random()*100).toFixed(2)+'%';
+        s.style.top=(Math.random()*92).toFixed(2)+'%';
+        s.style.fontSize=(8+Math.random()*14).toFixed(0)+'px';
+        s.style.animationDelay=(-Math.random()*3.2).toFixed(2)+'s';
+        s.style.animationDuration=(2.4+Math.random()*2.4).toFixed(2)+'s';
+        box.appendChild(s);
+      }
+    })();
+
+    // ---- 状态 ----
+    var audio=document.getElementById('audio');
+    var state={filter:'all', q:'', shuffle:false, autonext:true, order:[], pos:-1};
+    var view=[]; // 当前显示(过滤后)的 clips
+
+    // ---- 头部计数 ----
+    document.getElementById('count').textContent='✈ 共 '+CLIPS.length+' 条语音';
+
+    // ---- 分类筛选条 ----
+    var chips=document.getElementById('chips');
+    function countCat(k){var n=0;for(var i=0;i<CLIPS.length;i++)if(CLIPS[i].cat===k)n++;return n;}
+    function makeChip(key,label,color,n,on){
+      var b=document.createElement('button'); b.className='chip'+(on?' on':''); b.dataset.key=key;
+      if(on&&color) b.style.background=color;
+      b.innerHTML=(color?'<span class="dot" style="background:'+color+'"></span>':'')+
+        '<span>'+label+'</span><span class="n">'+n+'</span>';
+      b.onclick=function(){ state.filter=key; renderChips(); render(); };
+      return b;
+    }
+    function renderChips(){
+      chips.innerHTML='';
+      chips.appendChild(makeChip('all','全部','', CLIPS.length, state.filter==='all'));
+      CATS.forEach(function(c){
+        var n=countCat(c.key); if(!n) return;
+        chips.appendChild(makeChip(c.key,c.label,c.color,n,state.filter===c.key));
+      });
+    }
+
+    // ---- 渲染卡片 ----
+    var grid=document.getElementById('grid'), empty=document.getElementById('empty');
+    function matches(c){
+      if(state.filter!=='all' && c.cat!==state.filter) return false;
+      if(state.q){var q=state.q.toLowerCase();
+        if((c.cn||'').toLowerCase().indexOf(q)<0 && (c.jp||'').toLowerCase().indexOf(q)<0) return false;}
+      return true;
+    }
+    function render(){
+      view=CLIPS.filter(matches);
+      grid.innerHTML='';
+      empty.style.display=view.length?'none':'block';
+      var frag=document.createDocumentFragment();
+      view.forEach(function(c){
+        var cat=catMap[c.cat]||{label:'',color:'#7dd3fc'};
+        var card=document.createElement('button');
+        card.className='card'+(current&&current.id===c.id?' playing':'');
+        card.style.setProperty('--cc',cat.color);
+        card.dataset.id=c.id;
+        card.innerHTML='<p class="cn">'+esc(c.cn)+'</p><p class="jp">'+esc(c.jp)+'</p>'+
+          '<div class="meta"><span class="tag" style="background:'+cat.color+'">'+cat.label+'</span>'+
+          '<span class="play">▶</span></div>';
+        card.onclick=function(){ playClip(c, true); };
+        frag.appendChild(card);
+      });
+      grid.appendChild(frag);
+    }
+    function esc(s){return (s||'').replace(/[&<>"]/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[m];});}
+
+    // ---- 播放逻辑 ----
+    var current=null;
+    function buildOrder(){
+      state.order=view.length?view.map(function(c){return c.id;}):CLIPS.map(function(c){return c.id;});
+      if(state.shuffle){
+        for(var i=state.order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));
+          var t=state.order[i];state.order[i]=state.order[j];state.order[j]=t;}
+      }
+    }
+    function clipById(id){for(var i=0;i<CLIPS.length;i++)if(CLIPS[i].id===id)return CLIPS[i];return null;}
+    function playClip(c, rebuild){
+      if(!c) return;
+      current=c;
+      if(rebuild||!state.order.length){ buildOrder(); }
+      state.pos=state.order.indexOf(c.id);
+      audio.src=c.file;
+      audio.play().catch(function(){});
+      updateNP(); markPlaying();
+      scrollToCurrent(rebuild ? 'nearest' : 'center'); // 手动点击就近,自动切歌居中
+    }
+    function scrollToCurrent(block){
+      var el=grid.querySelector('.card.playing');
+      if(!el) return;
+      if(el.scrollIntoView) el.scrollIntoView({behavior:'smooth', block:block||'nearest'});
+      el.classList.remove('locate'); void el.offsetWidth; el.classList.add('locate'); // 重新触发脉冲
+      setTimeout(function(){ el.classList.remove('locate'); }, 800);
+    }
+    function step(d){
+      if(!state.order.length) buildOrder();
+      if(state.pos<0){ state.pos=0; } else { state.pos=(state.pos+d+state.order.length)%state.order.length; }
+      playClip(clipById(state.order[state.pos]), false);
+    }
+    function updateNP(){
+      var cat=current?(catMap[current.cat]||{}):{};
+      document.getElementById('npCn').textContent=current?current.cn:'点一条语音开始播放 ✧';
+      var jp=document.getElementById('npJp'); jp.textContent=current?current.jp:'摩耶,随时准备起飞!';
+      jp.classList.toggle('empty-hint',!current);
+    }
+    function markPlaying(){
+      var cards=grid.querySelectorAll('.card');
+      cards.forEach(function(el){
+        var on=current&&String(current.id)===el.dataset.id;
+        el.classList.toggle('playing',on);
+        var pb=el.querySelector('.play'); if(pb) pb.textContent=on?'❚❚':'▶';
+      });
+    }
+
+    // ---- 控件 ----
+    var pp=document.getElementById('playpause');
+    pp.onclick=function(){ if(!current){ step(1); return; } if(audio.paused) audio.play(); else audio.pause(); };
+    document.getElementById('prev').onclick=function(){ step(-1); };
+    document.getElementById('next').onclick=function(){ step(1); };
+    document.getElementById('shuffle').onclick=function(){ state.shuffle=!state.shuffle;
+      this.classList.toggle('on',state.shuffle); buildOrder(); if(current)state.pos=state.order.indexOf(current.id); };
+    var an=document.getElementById('autonext');
+    an.onclick=function(){ state.autonext=!state.autonext; this.classList.toggle('on',state.autonext); };
+    document.getElementById('shuffleAll').onclick=function(){
+      state.shuffle=true; document.getElementById('shuffle').classList.add('on');
+      buildOrder(); state.pos=-1; step(1);
+    };
+
+    audio.addEventListener('play',function(){ pp.textContent='❚❚'; markPlaying(); });
+    audio.addEventListener('pause',function(){ pp.textContent='▶'; markPlaying(); });
+    audio.addEventListener('ended',function(){ if(state.autonext) step(1); else { pp.textContent='▶'; } });
+
+    // ---- 进度条 ----
+    var fill=document.getElementById('fill'), knob=document.getElementById('knob'),
+        seek=document.getElementById('seek'), curT=document.getElementById('cur'), durT=document.getElementById('dur');
+    function fmt(t){ if(!isFinite(t))return '0:00'; var m=Math.floor(t/60),s=Math.floor(t%60); return m+':'+(s<10?'0':'')+s; }
+    audio.addEventListener('timeupdate',function(){
+      var p=audio.duration?(audio.currentTime/audio.duration*100):0;
+      fill.style.width=p+'%'; knob.style.left=p+'%'; curT.textContent=fmt(audio.currentTime);
+    });
+    audio.addEventListener('loadedmetadata',function(){ durT.textContent=fmt(audio.duration); });
+    function seekTo(e){ var r=seek.getBoundingClientRect(); var x=((e.clientX||(e.touches&&e.touches[0].clientX))-r.left)/r.width;
+      x=Math.max(0,Math.min(1,x)); if(audio.duration) audio.currentTime=x*audio.duration; }
+    var dragging=false;
+    seek.addEventListener('mousedown',function(e){dragging=true;seekTo(e);});
+    window.addEventListener('mousemove',function(e){if(dragging)seekTo(e);});
+    window.addEventListener('mouseup',function(){dragging=false;});
+    seek.addEventListener('click',seekTo);
+
+    // ---- 键盘 ----
+    document.addEventListener('keydown',function(e){
+      if(e.target.tagName==='INPUT') return;
+      if(e.code==='Space'){e.preventDefault();pp.click();}
+      else if(e.code==='ArrowRight'){step(1);}
+      else if(e.code==='ArrowLeft'){step(-1);}
+    });
+
+    // ---- 搜索 ----
+    var si=document.getElementById('search');
+    si.addEventListener('input',function(){ state.q=this.value.trim(); render(); });
+
+    // ---- 播放器:拖动 / 收起 / 位置记忆 ----
+    var player=document.getElementById('player');
+    var grip=document.getElementById('grip');
+    var collapseBtn=document.getElementById('collapse');
+    var drag={active:false,dx:0,dy:0,moved:false};
+
+    function savePlayer(){
+      try{
+        var d={collapsed:player.classList.contains('collapsed'),free:player.classList.contains('free')};
+        if(d.free){ d.left=parseFloat(player.style.left)||0; d.top=parseFloat(player.style.top)||0; }
+        localStorage.setItem('maya_player',JSON.stringify(d));
+      }catch(e){}
+    }
+    function clampPos(left,top){
+      var r=player.getBoundingClientRect();
+      var maxL=window.innerWidth-r.width-6, maxT=window.innerHeight-r.height-6;
+      return { left:Math.max(6,Math.min(left,Math.max(6,maxL))),
+               top:Math.max(6,Math.min(top,Math.max(6,maxT))) };
+    }
+    function setFree(left,top){
+      player.classList.add('free');
+      var c=clampPos(left,top);
+      player.style.left=c.left+'px'; player.style.top=c.top+'px'; player.style.bottom='auto';
+    }
+    grip.addEventListener('pointerdown',function(e){
+      e.preventDefault();
+      var r=player.getBoundingClientRect();
+      if(!player.classList.contains('free')){ // 首次拖动:把当前居中位置固定为 left/top
+        player.classList.add('free');
+        player.style.left=r.left+'px'; player.style.top=r.top+'px'; player.style.bottom='auto';
+      }
+      drag.active=true; drag.moved=false;
+      drag.dx=e.clientX-r.left; drag.dy=e.clientY-r.top;
+      player.classList.add('dragging');
+      try{ grip.setPointerCapture(e.pointerId); }catch(_){}
+    });
+    grip.addEventListener('pointermove',function(e){
+      if(!drag.active) return;
+      drag.moved=true;
+      setFree(e.clientX-drag.dx, e.clientY-drag.dy);
+    });
+    function endDrag(e){
+      if(!drag.active) return;
+      drag.active=false; player.classList.remove('dragging');
+      try{ grip.releasePointerCapture(e.pointerId); }catch(_){}
+      if(drag.moved) savePlayer();
+    }
+    grip.addEventListener('pointerup',endDrag);
+    grip.addEventListener('pointercancel',endDrag);
+
+    collapseBtn.addEventListener('click',function(){
+      var col=player.classList.toggle('collapsed');
+      collapseBtn.textContent=col?'▴':'▾';
+      if(player.classList.contains('free')){ // 尺寸变了,重新夹到可视范围
+        var r=player.getBoundingClientRect(); setFree(r.left,r.top);
+      }
+      savePlayer();
+    });
+
+    window.addEventListener('resize',function(){
+      if(player.classList.contains('free')){ var r=player.getBoundingClientRect(); setFree(r.left,r.top); }
+    });
+
+    function restorePlayer(){
+      try{
+        var d=JSON.parse(localStorage.getItem('maya_player')||'null'); if(!d) return;
+        if(d.collapsed){ player.classList.add('collapsed'); collapseBtn.textContent='▴'; }
+        if(d.free && d.left!=null){ setFree(d.left,d.top); }
+      }catch(e){}
+    }
+
+    // ---- 初始化 ----
+    renderChips(); render(); restorePlayer();
+  })();
+  </script>
+</body>
+</html>
