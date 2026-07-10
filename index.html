@@ -607,10 +607,11 @@
     var PAGE_SIZE=12;   // 每页展示数量
     var gpage=0;
 
-    // 背景飞过的小人:随机取图,且每飞完一轮(飞到屏幕外时)随机换一张,常看常新
+    // 背景飞过的小人:每飞完一轮随机换图 + 随机位置/大小(合理范围),常看常新
     (function(){
       var planes=document.querySelectorAll('.plane');
       if(!planes.length || !GALLERY.length) return;
+      function rand(a,b){ return a+Math.random()*(b-a); }
       function pick(im){
         var k=Math.floor(Math.random()*GALLERY.length), g=0;
         while(GALLERY.length>1 && k===im.__last && g++<8){ k=Math.floor(Math.random()*GALLERY.length); }
@@ -619,10 +620,16 @@
         im.fetchPriority='low';
         im.src=(item&&item.anim)||(item&&item.full)||(item&&item.thumb)||item;
       }
+      function respawn(pl, im){
+        pl.style.top=rand(6,70).toFixed(1)+'%';        // 竖直位置(避开顶栏与底部播放器)
+        var sz=Math.round(rand(46,100));               // 大小(合理范围)
+        pl.style.width=sz+'px'; pl.style.height=sz+'px';
+        pick(im);
+      }
       Array.prototype.forEach.call(planes,function(pl){
         var im=pl.querySelector('img'); if(!im) return;
-        pick(im);
-        pl.addEventListener('animationiteration',function(){ pick(im); });
+        respawn(pl, im);
+        pl.addEventListener('animationiteration',function(){ respawn(pl, im); });
       });
     })();
 
