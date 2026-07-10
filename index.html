@@ -423,10 +423,32 @@
       current=c;
       if(rebuild||!state.order.length){ buildOrder(); }
       state.pos=state.order.indexOf(c.id);
-      audio.src=c.file;
-      audio.play().catch(function(){});
+      playFile(c.file);
       updateNP(); markPlaying();
       scrollToCurrent(rebuild ? 'nearest' : 'center'); // 手动点击就近,自动切歌居中
+    }
+    // 播放一个音频文件;若浏览器因 MIME 非标准而拒绝,则改用 blob(强制 audio/mpeg)兜底
+    var _blobUrl=null;
+    function playFile(file){
+      if(_blobUrl){ try{ URL.revokeObjectURL(_blobUrl); }catch(_){} _blobUrl=null; }
+      audio.src=file;
+      var p=audio.play();
+      if(p&&p.catch) p.catch(function(err){
+        if(err&&err.name==='NotSupportedError'){ playViaBlob(file); }
+        else showPlayErr(err);
+      });
+    }
+    function playViaBlob(file){
+      fetch(file).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); }).then(function(b){
+        _blobUrl=URL.createObjectURL(new Blob([b],{type:'audio/mpeg'}));
+        audio.src=_blobUrl;
+        return audio.play();
+      }).catch(showPlayErr);
+    }
+    function showPlayErr(err){
+      var jp=document.getElementById('npJp');
+      if(jp){ jp.textContent='⚠ 播放失败:'+((err&&err.name)||(err&&err.message)||'未知'); jp.classList.remove('empty-hint'); }
+      try{ console.error('play error', err, 'audio.error=', audio.error); }catch(_){}
     }
     function scrollToCurrent(block){
       var el=grid.querySelector('.card.playing');
@@ -472,6 +494,7 @@
     audio.addEventListener('play',function(){ pp.textContent='❚❚'; markPlaying(); });
     audio.addEventListener('pause',function(){ pp.textContent='▶'; markPlaying(); });
     audio.addEventListener('ended',function(){ if(state.autonext) step(1); else { pp.textContent='▶'; } });
+    audio.addEventListener('error',function(){ try{ console.error('media error code', audio.error&&audio.error.code); }catch(_){} });
 
     // ---- 进度条 ----
     var fill=document.getElementById('fill'), knob=document.getElementById('knob'),
@@ -594,6 +617,7 @@
         while(used[k] && guard++<GALLERY.length){ k=(k+1)%GALLERY.length; }
         used[k]=1;
         var item=GALLERY[k];
+        im.fetchPriority='low';
         im.src=(item&&item.anim)||(item&&item.full)||(item&&item.thumb)||item;
       });
     })();
@@ -623,7 +647,7 @@
           var card=document.createElement('div'); card.className='gcard';
           card.setAttribute('data-anim',anim); card.setAttribute('data-thumb',thumb);
           var img=document.createElement('img');
-          img.loading='lazy'; img.decoding='async'; img.src=thumb; img.alt='动图 '+(gi+1);
+          img.loading='lazy'; img.decoding='async'; img.fetchPriority='low'; img.src=thumb; img.alt='动图 '+(gi+1);
           card.__img=img; card.appendChild(img);
           card.onclick=function(){ openLb(gi); };
           frag.appendChild(card);
