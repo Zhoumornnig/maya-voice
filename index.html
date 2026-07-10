@@ -217,6 +217,11 @@
   .ctrl.big{width:52px;height:52px;font-size:20px;background:linear-gradient(135deg,var(--pink),#ff9ec3);color:#fff}
   .ctrl.small{width:34px;height:34px;font-size:13px}
   .ctrl.toggle.on{color:var(--pink);box-shadow:inset 0 0 0 2px var(--pink)}
+  .volslider{width:72px;height:5px;appearance:none;-webkit-appearance:none;background:rgba(120,170,210,.28);
+    border-radius:5px;outline:0;cursor:pointer;accent-color:var(--pink)}
+  .volslider::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:14px;height:14px;
+    border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer}
+  @media (max-width:720px){ .volslider{width:60px} }
   .seekwrap{flex:2;min-width:120px;display:flex;align-items:center;gap:10px}
   .time{font-size:11px;color:var(--ink-soft);font-variant-numeric:tabular-nums;min-width:34px;text-align:center}
   .seek{flex:1;height:6px;border-radius:6px;background:rgba(120,170,210,.28);position:relative;cursor:pointer}
@@ -230,7 +235,9 @@
   .player.collapsed .np,
   .player.collapsed .seekwrap,
   .player.collapsed #shuffle,
-  .player.collapsed #autonext{display:none}
+  .player.collapsed #autonext,
+  .player.collapsed #volBtn,
+  .player.collapsed #volSlider{display:none}
 
   @media (max-width:720px){
     .player{width:calc(100vw - 20px);bottom:12px}
@@ -238,6 +245,7 @@
     .grip{order:1}#collapse{order:2}
     .np{order:3;flex-basis:calc(100% - 84px)}
     .pbtns{order:4}.seekwrap{order:5;flex-basis:100%}
+    #volBtn{order:6}#volSlider{order:7}
     .player.collapsed .np{display:none}
   }
 </style>
@@ -320,6 +328,8 @@
         <div class="seek" id="seek"><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
         <span class="time" id="dur">0:00</span>
       </div>
+      <button class="ctrl" id="volBtn" title="静音/取消静音" aria-label="静音切换">🔊</button>
+      <input type="range" id="volSlider" class="volslider" min="0" max="100" value="100" title="音量" aria-label="音量" />
     </div>
   </div>
 
@@ -508,6 +518,16 @@
     audio.addEventListener('play',function(){ pp.textContent='❚❚'; markPlaying(); });
     audio.addEventListener('pause',function(){ pp.textContent='▶'; markPlaying(); });
     audio.addEventListener('ended',function(){ if(state.autonext) step(1); else { pp.textContent='▶'; } });
+    // 音量控制
+    var volBtn=document.getElementById('volBtn'), volSlider=document.getElementById('volSlider'), lastVol=1;
+    audio.volume=1; volSlider.value=100;
+    function updateVolIcon(v){ volBtn.textContent=v===0?'🔇':v<.5?'🔉':'🔊'; }
+    volSlider.addEventListener('input',function(){ audio.volume=this.value/100; updateVolIcon(audio.volume); });
+    volBtn.addEventListener('click',function(){
+      if(audio.volume>0){ lastVol=audio.volume; audio.volume=0; volSlider.value=0; }
+      else { audio.volume=lastVol||1; volSlider.value=Math.round(audio.volume*100); }
+      updateVolIcon(audio.volume);
+    });
     audio.addEventListener('error',function(){ try{ console.error('media error code', audio.error&&audio.error.code); }catch(_){} });
 
     // ---- 进度条 ----
