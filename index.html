@@ -125,7 +125,8 @@
   .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;
     max-width:1120px;margin:18px auto 0;padding:0 20px}
   .gcard{border-radius:16px;overflow:hidden;cursor:zoom-in;border:1px solid var(--card-brd);
-    box-shadow:var(--shadow);background:var(--card);line-height:0;transition:.16s}
+    box-shadow:var(--shadow);background:var(--card);line-height:0;transition:.16s;
+    content-visibility:auto;contain-intrinsic-size:220px 220px}
   .gcard:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(48,96,140,.24)}
   .gcard img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:rgba(255,255,255,.4)}
 
@@ -527,10 +528,11 @@
     function buildGallery(){
       if(galleryBuilt) return; galleryBuilt=true;
       var frag=document.createDocumentFragment();
-      GALLERY.forEach(function(src,i){
+      GALLERY.forEach(function(item,i){
+        var thumb=(item&&item.thumb)||(item&&item.full)||item;
         var card=document.createElement('div'); card.className='gcard';
         var img=document.createElement('img');
-        img.loading='lazy'; img.decoding='async'; img.src=src; img.alt='动图 '+(i+1);
+        img.loading='lazy'; img.decoding='async'; img.src=thumb; img.alt='动图 '+(i+1);
         card.appendChild(img);
         card.onclick=function(){ openLb(i); };
         frag.appendChild(card);
@@ -551,7 +553,8 @@
     // ---- 灯箱 ----
     var lb=document.getElementById('lightbox'), lbImg=document.getElementById('lbImg'),
         lbCount=document.getElementById('lbCount'), lbIdx=0;
-    function openLb(i){ lbIdx=i; lbImg.src=GALLERY[i]; lbCount.textContent=(i+1)+' / '+GALLERY.length; lb.classList.add('on'); }
+    function openLb(i){ lbIdx=i; var item=GALLERY[i]; var full=(item&&item.full)||(item&&item.thumb)||item;
+      lbImg.src=full; lbCount.textContent=(i+1)+' / '+GALLERY.length; lb.classList.add('on'); }
     function closeLb(){ lb.classList.remove('on'); lbImg.src=''; }
     function lbStep(d){ lbIdx=(lbIdx+d+GALLERY.length)%GALLERY.length; openLb(lbIdx); }
     document.getElementById('lbClose').onclick=closeLb;

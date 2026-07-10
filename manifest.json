@@ -1782,79 +1782,301 @@
     }
   ],
   "gallery": [
-    "gallery/gif001.webp",
-    "gallery/gif002.webp",
-    "gallery/gif003.webp",
-    "gallery/gif004.webp",
-    "gallery/gif005.webp",
-    "gallery/gif006.webp",
-    "gallery/gif007.webp",
-    "gallery/gif008.webp",
-    "gallery/gif009.webp",
-    "gallery/gif010.webp",
-    "gallery/gif011.webp",
-    "gallery/gif012.webp",
-    "gallery/gif013.webp",
-    "gallery/gif014.webp",
-    "gallery/gif015.webp",
-    "gallery/gif016.webp",
-    "gallery/gif017.webp",
-    "gallery/gif018.webp",
-    "gallery/gif019.webp",
-    "gallery/gif020.webp",
-    "gallery/gif021.webp",
-    "gallery/gif022.webp",
-    "gallery/gif023.webp",
-    "gallery/gif024.webp",
-    "gallery/gif025.webp",
-    "gallery/gif026.webp",
-    "gallery/gif027.webp",
-    "gallery/gif028.webp",
-    "gallery/gif029.webp",
-    "gallery/gif030.webp",
-    "gallery/gif031.webp",
-    "gallery/gif032.webp",
-    "gallery/gif033.webp",
-    "gallery/gif034.webp",
-    "gallery/gif035.webp",
-    "gallery/gif036.webp",
-    "gallery/gif037.webp",
-    "gallery/gif038.webp",
-    "gallery/gif039.webp",
-    "gallery/gif040.webp",
-    "gallery/gif041.webp",
-    "gallery/gif042.webp",
-    "gallery/gif043.webp",
-    "gallery/gif044.webp",
-    "gallery/gif045.webp",
-    "gallery/gif046.webp",
-    "gallery/gif047.webp",
-    "gallery/gif048.webp",
-    "gallery/gif049.webp",
-    "gallery/gif050.webp",
-    "gallery/gif051.webp",
-    "gallery/gif052.webp",
-    "gallery/gif053.webp",
-    "gallery/gif054.webp",
-    "gallery/gif055.webp",
-    "gallery/gif056.webp",
-    "gallery/gif057.webp",
-    "gallery/gif058.webp",
-    "gallery/gif059.webp",
-    "gallery/gif060.webp",
-    "gallery/gif061.webp",
-    "gallery/gif062.webp",
-    "gallery/gif063.webp",
-    "gallery/gif064.webp",
-    "gallery/gif065.webp",
-    "gallery/gif066.webp",
-    "gallery/gif067.webp",
-    "gallery/gif068.webp",
-    "gallery/gif069.webp",
-    "gallery/gif070.webp",
-    "gallery/gif071.webp",
-    "gallery/gif072.webp",
-    "gallery/gif073.webp",
-    "gallery/gif074.webp"
+    {
+      "full": "gallery/gif001.webp",
+      "thumb": "gallery/thumbs/gif001.webp"
+    },
+    {
+      "full": "gallery/gif002.webp",
+      "thumb": "gallery/thumbs/gif002.webp"
+    },
+    {
+      "full": "gallery/gif003.webp",
+      "thumb": "gallery/thumbs/gif003.webp"
+    },
+    {
+      "full": "gallery/gif004.webp",
+      "thumb": "gallery/thumbs/gif004.webp"
+    },
+    {
+      "full": "gallery/gif005.webp",
+      "thumb": "gallery/thumbs/gif005.webp"
+    },
+    {
+      "full": "gallery/gif006.webp",
+      "thumb": "gallery/thumbs/gif006.webp"
+    },
+    {
+      "full": "gallery/gif007.webp",
+      "thumb": "gallery/thumbs/gif007.webp"
+    },
+    {
+      "full": "gallery/gif008.webp",
+      "thumb": "gallery/thumbs/gif008.webp"
+    },
+    {
+      "full": "gallery/gif009.webp",
+      "thumb": "gallery/thumbs/gif009.webp"
+    },
+    {
+      "full": "gallery/gif010.webp",
+      "thumb": "gallery/thumbs/gif010.webp"
+    },
+    {
+      "full": "gallery/gif011.webp",
+      "thumb": "gallery/thumbs/gif011.webp"
+    },
+    {
+      "full": "gallery/gif012.webp",
+      "thumb": "gallery/thumbs/gif012.webp"
+    },
+    {
+      "full": "gallery/gif013.webp",
+      "thumb": "gallery/thumbs/gif013.webp"
+    },
+    {
+      "full": "gallery/gif014.webp",
+      "thumb": "gallery/thumbs/gif014.webp"
+    },
+    {
+      "full": "gallery/gif015.webp",
+      "thumb": "gallery/thumbs/gif015.webp"
+    },
+    {
+      "full": "gallery/gif016.webp",
+      "thumb": "gallery/thumbs/gif016.webp"
+    },
+    {
+      "full": "gallery/gif017.webp",
+      "thumb": "gallery/thumbs/gif017.webp"
+    },
+    {
+      "full": "gallery/gif018.webp",
+      "thumb": "gallery/thumbs/gif018.webp"
+    },
+    {
+      "full": "gallery/gif019.webp",
+      "thumb": "gallery/thumbs/gif019.webp"
+    },
+    {
+      "full": "gallery/gif020.webp",
+      "thumb": "gallery/thumbs/gif020.webp"
+    },
+    {
+      "full": "gallery/gif021.webp",
+      "thumb": "gallery/thumbs/gif021.webp"
+    },
+    {
+      "full": "gallery/gif022.webp",
+      "thumb": "gallery/thumbs/gif022.webp"
+    },
+    {
+      "full": "gallery/gif023.webp",
+      "thumb": "gallery/thumbs/gif023.webp"
+    },
+    {
+      "full": "gallery/gif024.webp",
+      "thumb": "gallery/thumbs/gif024.webp"
+    },
+    {
+      "full": "gallery/gif025.webp",
+      "thumb": "gallery/thumbs/gif025.webp"
+    },
+    {
+      "full": "gallery/gif026.webp",
+      "thumb": "gallery/thumbs/gif026.webp"
+    },
+    {
+      "full": "gallery/gif027.webp",
+      "thumb": "gallery/thumbs/gif027.webp"
+    },
+    {
+      "full": "gallery/gif028.webp",
+      "thumb": "gallery/thumbs/gif028.webp"
+    },
+    {
+      "full": "gallery/gif029.webp",
+      "thumb": "gallery/thumbs/gif029.webp"
+    },
+    {
+      "full": "gallery/gif030.webp",
+      "thumb": "gallery/thumbs/gif030.webp"
+    },
+    {
+      "full": "gallery/gif031.webp",
+      "thumb": "gallery/thumbs/gif031.webp"
+    },
+    {
+      "full": "gallery/gif032.webp",
+      "thumb": "gallery/thumbs/gif032.webp"
+    },
+    {
+      "full": "gallery/gif033.webp",
+      "thumb": "gallery/thumbs/gif033.webp"
+    },
+    {
+      "full": "gallery/gif034.webp",
+      "thumb": "gallery/thumbs/gif034.webp"
+    },
+    {
+      "full": "gallery/gif035.webp",
+      "thumb": "gallery/thumbs/gif035.webp"
+    },
+    {
+      "full": "gallery/gif036.webp",
+      "thumb": "gallery/thumbs/gif036.webp"
+    },
+    {
+      "full": "gallery/gif037.webp",
+      "thumb": "gallery/thumbs/gif037.webp"
+    },
+    {
+      "full": "gallery/gif038.webp",
+      "thumb": "gallery/thumbs/gif038.webp"
+    },
+    {
+      "full": "gallery/gif039.webp",
+      "thumb": "gallery/thumbs/gif039.webp"
+    },
+    {
+      "full": "gallery/gif040.webp",
+      "thumb": "gallery/thumbs/gif040.webp"
+    },
+    {
+      "full": "gallery/gif041.webp",
+      "thumb": "gallery/thumbs/gif041.webp"
+    },
+    {
+      "full": "gallery/gif042.webp",
+      "thumb": "gallery/thumbs/gif042.webp"
+    },
+    {
+      "full": "gallery/gif043.webp",
+      "thumb": "gallery/thumbs/gif043.webp"
+    },
+    {
+      "full": "gallery/gif044.webp",
+      "thumb": "gallery/thumbs/gif044.webp"
+    },
+    {
+      "full": "gallery/gif045.webp",
+      "thumb": "gallery/thumbs/gif045.webp"
+    },
+    {
+      "full": "gallery/gif046.webp",
+      "thumb": "gallery/thumbs/gif046.webp"
+    },
+    {
+      "full": "gallery/gif047.webp",
+      "thumb": "gallery/thumbs/gif047.webp"
+    },
+    {
+      "full": "gallery/gif048.webp",
+      "thumb": "gallery/thumbs/gif048.webp"
+    },
+    {
+      "full": "gallery/gif049.webp",
+      "thumb": "gallery/thumbs/gif049.webp"
+    },
+    {
+      "full": "gallery/gif050.webp",
+      "thumb": "gallery/thumbs/gif050.webp"
+    },
+    {
+      "full": "gallery/gif051.webp",
+      "thumb": "gallery/thumbs/gif051.webp"
+    },
+    {
+      "full": "gallery/gif052.webp",
+      "thumb": "gallery/thumbs/gif052.webp"
+    },
+    {
+      "full": "gallery/gif053.webp",
+      "thumb": "gallery/thumbs/gif053.webp"
+    },
+    {
+      "full": "gallery/gif054.webp",
+      "thumb": "gallery/thumbs/gif054.webp"
+    },
+    {
+      "full": "gallery/gif055.webp",
+      "thumb": "gallery/thumbs/gif055.webp"
+    },
+    {
+      "full": "gallery/gif056.webp",
+      "thumb": "gallery/thumbs/gif056.webp"
+    },
+    {
+      "full": "gallery/gif057.webp",
+      "thumb": "gallery/thumbs/gif057.webp"
+    },
+    {
+      "full": "gallery/gif058.webp",
+      "thumb": "gallery/thumbs/gif058.webp"
+    },
+    {
+      "full": "gallery/gif059.webp",
+      "thumb": "gallery/thumbs/gif059.webp"
+    },
+    {
+      "full": "gallery/gif060.webp",
+      "thumb": "gallery/thumbs/gif060.webp"
+    },
+    {
+      "full": "gallery/gif061.webp",
+      "thumb": "gallery/thumbs/gif061.webp"
+    },
+    {
+      "full": "gallery/gif062.webp",
+      "thumb": "gallery/thumbs/gif062.webp"
+    },
+    {
+      "full": "gallery/gif063.webp",
+      "thumb": "gallery/thumbs/gif063.webp"
+    },
+    {
+      "full": "gallery/gif064.webp",
+      "thumb": "gallery/thumbs/gif064.webp"
+    },
+    {
+      "full": "gallery/gif065.webp",
+      "thumb": "gallery/thumbs/gif065.webp"
+    },
+    {
+      "full": "gallery/gif066.webp",
+      "thumb": "gallery/thumbs/gif066.webp"
+    },
+    {
+      "full": "gallery/gif067.webp",
+      "thumb": "gallery/thumbs/gif067.webp"
+    },
+    {
+      "full": "gallery/gif068.webp",
+      "thumb": "gallery/thumbs/gif068.webp"
+    },
+    {
+      "full": "gallery/gif069.webp",
+      "thumb": "gallery/thumbs/gif069.webp"
+    },
+    {
+      "full": "gallery/gif070.webp",
+      "thumb": "gallery/thumbs/gif070.webp"
+    },
+    {
+      "full": "gallery/gif071.webp",
+      "thumb": "gallery/thumbs/gif071.webp"
+    },
+    {
+      "full": "gallery/gif072.webp",
+      "thumb": "gallery/thumbs/gif072.webp"
+    },
+    {
+      "full": "gallery/gif073.webp",
+      "thumb": "gallery/thumbs/gif073.webp"
+    },
+    {
+      "full": "gallery/gif074.webp",
+      "thumb": "gallery/thumbs/gif074.webp"
+    }
   ]
 }
