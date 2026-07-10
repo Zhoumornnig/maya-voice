@@ -182,15 +182,6 @@
   .pgbtn:disabled{opacity:.4;cursor:default}
   .pgbtn.dots{background:transparent;box-shadow:none;cursor:default}
 
-  /* ===== 预加载进度 ===== */
-  .preload{position:fixed;top:14px;left:14px;z-index:40;padding:7px 14px;border-radius:999px;font-size:12px;font-weight:800;
-    background:rgba(255,255,255,.92);color:var(--ink);box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;
-    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-  .preload::before{content:"";width:12px;height:12px;border-radius:50%;flex:0 0 auto;
-    border:2px solid rgba(255,133,179,.35);border-top-color:var(--pink);animation:spin .8s linear infinite}
-  .preload.done::before{border:2px solid #34d399;border-top-color:#34d399;animation:none}
-  @keyframes spin{to{transform:rotate(360deg)}}
-
   /* ===== 悬浮播放器(可拖动 / 可收起) ===== */
   .player{position:fixed;z-index:30;left:50%;bottom:22px;transform:translateX(-50%);
     width:min(1040px,calc(100vw - 32px));
@@ -319,7 +310,6 @@
   </div>
 
   <audio id="audio" preload="none"></audio>
-  <div class="preload" id="preload" style="display:none">预加载动图…</div>
   <script src="data.js"></script>
   <script>
   (function(){
@@ -604,16 +594,16 @@
         while(used[k] && guard++<GALLERY.length){ k=(k+1)%GALLERY.length; }
         used[k]=1;
         var item=GALLERY[k];
-        im.src=(item&&item.full)||(item&&item.thumb)||item;
+        im.src=(item&&item.anim)||(item&&item.full)||(item&&item.thumb)||item;
       });
     })();
 
-    // 视口内才加载完整动图(播放),离开视野换回静态缩略图(省资源)
+    // 视口内才加载压缩动图(播放),离开视野换回静态缩略图(省资源)
     var galIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
       entries.forEach(function(e){
         var card=e.target, img=card.__img; if(!img) return;
-        var full=card.getAttribute('data-full'), thumb=card.getAttribute('data-thumb');
-        if(e.isIntersecting){ if(img.getAttribute('src')!==full) img.src=full; }
+        var anim=card.getAttribute('data-anim'), thumb=card.getAttribute('data-thumb');
+        if(e.isIntersecting){ if(img.getAttribute('src')!==anim) img.src=anim; }
         else { if(img.getAttribute('src')!==thumb) img.src=thumb; }
       });
     }, { rootMargin:'120px 0px' }) : null;
@@ -629,9 +619,9 @@
         (function(gi){
           var item=GALLERY[gi];
           var thumb=(item&&item.thumb)||(item&&item.full)||item;
-          var full=(item&&item.full)||thumb;
+          var anim=(item&&item.anim)||(item&&item.full)||thumb;
           var card=document.createElement('div'); card.className='gcard';
-          card.setAttribute('data-full',full); card.setAttribute('data-thumb',thumb);
+          card.setAttribute('data-anim',anim); card.setAttribute('data-thumb',thumb);
           var img=document.createElement('img');
           img.loading='lazy'; img.decoding='async'; img.src=thumb; img.alt='动图 '+(gi+1);
           card.__img=img; card.appendChild(img);
@@ -669,23 +659,6 @@
       });
       pager.appendChild(mk('›',gpage+1,'',gpage===pages-1));
     }
-
-    // 提前预加载全部动图到浏览器缓存(浏览时秒开)
-    function preloadAll(){
-      if(!GALLERY.length) return;
-      var pill=document.getElementById('preload');
-      var urls=GALLERY.map(function(it){ return (it&&it.full)||(it&&it.thumb)||it; }).filter(Boolean);
-      var total=urls.length, done=0, idx=0, CONC=6;
-      function upd(){
-        if(!pill) return;
-        if(done>=total){ pill.classList.add('done'); pill.textContent='动图已全部加载 '+total; setTimeout(function(){ pill.style.display='none'; },1600); }
-        else { pill.textContent='预加载动图 '+done+' / '+total; }
-      }
-      function next(){ if(idx>=urls.length) return; var u=urls[idx++]; var im=new Image();
-        im.onload=im.onerror=function(){ done++; upd(); next(); }; im.src=u; }
-      if(pill){ pill.style.display=''; upd(); }
-      for(var c=0;c<CONC;c++) next();
-    }
     function switchView(v){
       var g=(v==='gallery');
       Array.prototype.forEach.call(tabs.children,function(b){ b.classList.toggle('on',b.dataset.view===v); });
@@ -722,7 +695,7 @@
       if(GALLERY.length){ galTab.textContent='🖼 动图 '+GALLERY.length; }
       else { galTab.style.display='none'; }
     })();
-    renderChips(); render(); restorePlayer(); preloadAll();
+    renderChips(); render(); restorePlayer();
   })();
   </script>
 </body>

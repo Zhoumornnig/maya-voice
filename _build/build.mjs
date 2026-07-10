@@ -83,18 +83,20 @@ for (const c of copied) {
 }
 console.log(`🧹 已移除原始日文名文件: ${removed} 个(原名已记录在 manifest.json 中)`);
 
-// 扫描画廊动图(gallery/ 子文件夹);优先用 thumbs/ 里的静态缩略图
+// 扫描画廊动图(gallery/);thumbs/ 静态缩略图、anim/ 压缩动图,full 为原图
 let gallery = [];
 const galleryDir = path.join(SITE, "gallery");
 const thumbsDir = path.join(galleryDir, "thumbs");
+const animDir = path.join(galleryDir, "anim");
 if (fs.existsSync(galleryDir)) {
   gallery = fs.readdirSync(galleryDir)
     .filter(f => /^gif\d+\.(webp|gif|png|jpe?g)$/i.test(f))
     .sort()
     .map(f => {
       const full = "gallery/" + f;
-      const hasThumb = fs.existsSync(path.join(thumbsDir, f));
-      return { full, thumb: hasThumb ? "gallery/thumbs/" + f : full };
+      const thumb = fs.existsSync(path.join(thumbsDir, f)) ? "gallery/thumbs/" + f : full;
+      const anim  = fs.existsSync(path.join(animDir, f))   ? "gallery/anim/" + f   : full;
+      return { full, thumb, anim };
     });
 }
 console.log(`🖼  画廊图片: ${gallery.length}`);
