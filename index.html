@@ -113,6 +113,37 @@
   .card.playing .play{background:linear-gradient(135deg,var(--pink),#ff9ec3);color:#fff}
   .empty{text-align:center;color:#5b7793;padding:60px 0;font-size:15px}
 
+  /* ===== 视图切换 Tabs ===== */
+  .tabs{display:inline-flex;gap:6px;margin-top:16px;padding:5px;border-radius:999px;
+    background:rgba(255,255,255,.6);box-shadow:var(--shadow)}
+  .tab{border:0;cursor:pointer;border-radius:999px;padding:7px 20px;font-size:14px;font-weight:800;
+    background:transparent;color:var(--ink);transition:.15s}
+  .tab:hover{color:var(--pink)}
+  .tab.on{background:linear-gradient(135deg,var(--pink),#ff9ec3);color:#fff;box-shadow:0 4px 12px rgba(255,133,179,.4)}
+
+  /* ===== 动图画廊 ===== */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;
+    max-width:1120px;margin:18px auto 0;padding:0 20px}
+  .gcard{border-radius:16px;overflow:hidden;cursor:zoom-in;border:1px solid var(--card-brd);
+    box-shadow:var(--shadow);background:var(--card);line-height:0;transition:.16s}
+  .gcard:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(48,96,140,.24)}
+  .gcard img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:rgba(255,255,255,.4)}
+
+  /* ===== 灯箱(点击放大)===== */
+  .lightbox{position:fixed;inset:0;z-index:60;display:none;place-items:center;
+    background:rgba(20,40,60,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .lightbox.on{display:grid}
+  .lightbox img{max-width:92vw;max-height:82vh;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .lb-btn{position:absolute;border:0;cursor:pointer;background:rgba(255,255,255,.92);color:var(--ink);
+    width:48px;height:48px;border-radius:50%;font-size:22px;display:grid;place-items:center;box-shadow:var(--shadow);transition:.15s}
+  .lb-btn:hover{background:#fff;color:var(--pink)}
+  .lb-close{top:20px;right:20px}
+  .lb-prev{left:16px;top:50%;transform:translateY(-50%)}
+  .lb-next{right:16px;top:50%;transform:translateY(-50%)}
+  .lb-count{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:#fff;
+    font-size:13px;font-weight:700;background:rgba(0,0,0,.4);padding:5px 14px;border-radius:999px}
+  @media (max-width:520px){ .lb-btn{width:40px;height:40px;font-size:18px} .gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} }
+
   /* ===== 悬浮播放器(可拖动 / 可收起) ===== */
   .player{position:fixed;z-index:30;left:50%;bottom:22px;transform:translateX(-50%);
     width:min(1040px,calc(100vw - 32px));
@@ -179,6 +210,10 @@
     <h1 class="title">摩耶重炮 语音站</h1>
     <p class="subtitle">マヤノトップガン ボイスコレクション</p>
     <div><span class="count" id="count">✈ 共 0 条语音</span></div>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-view="voice">🎧 语音</button>
+      <button class="tab" data-view="gallery">🖼 动图</button>
+    </div>
   </header>
 
   <div class="controls">
@@ -194,10 +229,20 @@
     </div>
   </div>
 
-  <main>
+  <main id="voiceView">
     <div class="grid" id="grid"></div>
     <div class="empty" id="empty" style="display:none">没有匹配的语音,换个关键词试试~</div>
   </main>
+
+  <div class="gallery" id="galleryView" style="display:none"></div>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lb-btn lb-close" id="lbClose" aria-label="关闭">✕</button>
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="上一张">‹</button>
+    <img id="lbImg" alt="动图" />
+    <button class="lb-btn lb-next" id="lbNext" aria-label="下一张">›</button>
+    <div class="lb-count" id="lbCount"></div>
+  </div>
 
   <!-- 播放器(可拖动 / 可收起) -->
   <div class="player" id="player">
@@ -390,6 +435,7 @@
     // ---- 键盘 ----
     document.addEventListener('keydown',function(e){
       if(e.target.tagName==='INPUT') return;
+      if(document.getElementById('lightbox').classList.contains('on')) return; // 灯箱打开时交给灯箱处理
       if(e.code==='Space'){e.preventDefault();pp.click();}
       else if(e.code==='ArrowRight'){step(1);}
       else if(e.code==='ArrowLeft'){step(-1);}
@@ -470,7 +516,61 @@
       }catch(e){}
     }
 
+    // ---- 视图切换 + 动图画廊 ----
+    var GALLERY=DATA.gallery||[];
+    var voiceView=document.getElementById('voiceView');
+    var controls=document.querySelector('.controls');
+    var galleryView=document.getElementById('galleryView');
+    var tabs=document.getElementById('tabs');
+    var galleryBuilt=false;
+
+    function buildGallery(){
+      if(galleryBuilt) return; galleryBuilt=true;
+      var frag=document.createDocumentFragment();
+      GALLERY.forEach(function(src,i){
+        var card=document.createElement('div'); card.className='gcard';
+        var img=document.createElement('img');
+        img.loading='lazy'; img.decoding='async'; img.src=src; img.alt='动图 '+(i+1);
+        card.appendChild(img);
+        card.onclick=function(){ openLb(i); };
+        frag.appendChild(card);
+      });
+      galleryView.appendChild(frag);
+    }
+    function switchView(v){
+      var g=(v==='gallery');
+      Array.prototype.forEach.call(tabs.children,function(b){ b.classList.toggle('on',b.dataset.view===v); });
+      voiceView.style.display=g?'none':'';
+      controls.style.display=g?'none':'';
+      galleryView.style.display=g?'':'none';
+      if(g) buildGallery();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    Array.prototype.forEach.call(tabs.children,function(b){ b.onclick=function(){ switchView(b.dataset.view); }; });
+
+    // ---- 灯箱 ----
+    var lb=document.getElementById('lightbox'), lbImg=document.getElementById('lbImg'),
+        lbCount=document.getElementById('lbCount'), lbIdx=0;
+    function openLb(i){ lbIdx=i; lbImg.src=GALLERY[i]; lbCount.textContent=(i+1)+' / '+GALLERY.length; lb.classList.add('on'); }
+    function closeLb(){ lb.classList.remove('on'); lbImg.src=''; }
+    function lbStep(d){ lbIdx=(lbIdx+d+GALLERY.length)%GALLERY.length; openLb(lbIdx); }
+    document.getElementById('lbClose').onclick=closeLb;
+    document.getElementById('lbPrev').onclick=function(e){ e.stopPropagation(); lbStep(-1); };
+    document.getElementById('lbNext').onclick=function(e){ e.stopPropagation(); lbStep(1); };
+    lb.onclick=function(e){ if(e.target===lb) closeLb(); };
+    document.addEventListener('keydown',function(e){
+      if(!lb.classList.contains('on')) return;
+      if(e.key==='Escape') closeLb();
+      else if(e.key==='ArrowRight') lbStep(1);
+      else if(e.key==='ArrowLeft') lbStep(-1);
+    });
+
     // ---- 初始化 ----
+    (function(){
+      var galTab=tabs.querySelector('[data-view="gallery"]');
+      if(GALLERY.length){ galTab.textContent='🖼 动图 '+GALLERY.length; }
+      else { galTab.style.display='none'; }
+    })();
     renderChips(); render(); restorePlayer();
   })();
   </script>

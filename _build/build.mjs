@@ -83,6 +83,17 @@ for (const c of copied) {
 }
 console.log(`🧹 已移除原始日文名文件: ${removed} 个(原名已记录在 manifest.json 中)`);
 
+// 扫描画廊动图(gallery/ 子文件夹)
+let gallery = [];
+const galleryDir = path.join(SITE, "gallery");
+if (fs.existsSync(galleryDir)) {
+  gallery = fs.readdirSync(galleryDir)
+    .filter(f => /\.(webp|gif|png|jpe?g)$/i.test(f))
+    .sort()
+    .map(f => "gallery/" + f);
+}
+console.log(`🖼  画廊图片: ${gallery.length}`);
+
 // 生成数据对象
 const data = {
   title: "摩耶重炮 语音站",
@@ -90,6 +101,7 @@ const data = {
   count: clips.length,
   categories: CATEGORIES,
   clips,
+  gallery,
 };
 
 // manifest.json(标准数据文件)
