@@ -57,7 +57,7 @@
 
   /* 随机出现/移动/消失的角色动图 */
   .sprite{position:absolute;opacity:0;pointer-events:none;will-change:transform,opacity;
-    filter:drop-shadow(0 5px 10px rgba(60,110,150,.35))}
+    z-index:0;filter:drop-shadow(0 5px 10px rgba(60,110,150,.35))}
   .sprite img{width:100%;height:100%;object-fit:contain;display:block;animation:floaty 4.5s ease-in-out infinite}
   @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 
@@ -621,10 +621,10 @@
         pick(im);
         var sz=Math.round(rand(72,130));
         sp.style.width=sz+'px'; sp.style.height=sz+'px';
-        sp.style.left=rand(4,78).toFixed(1)+'%';        // 随机水平位置(不一定从最左)
-        sp.style.top=rand(8,64).toFixed(1)+'%';         // 随机竖直位置(避开顶栏/播放器)
+        sp.style.left=rand(8,72).toFixed(1)+'%';        // 随机水平(避开边缘)
+        sp.style.top=rand(14,48).toFixed(1)+'%';        // 随机竖直(远离顶栏与底部播放器)
         var lifeMs=rand(5000,8000), lifeSec=lifeMs/1000; // 存在 5~8 秒
-        var dx=rand(-12,12), dy=rand(-8,8);             // 生命周期内滑行的方向/距离
+        var dx=rand(-6,6), dy=rand(-4,4);               // 移动范围收窄,不越界
         // 复位(无过渡),置于不可见起点
         sp.style.transition='none';
         sp.style.opacity='0';
