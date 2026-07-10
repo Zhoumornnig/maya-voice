@@ -145,6 +145,15 @@
     font-size:13px;font-weight:700;background:rgba(0,0,0,.4);padding:5px 14px;border-radius:999px}
   @media (max-width:520px){ .lb-btn{width:40px;height:40px;font-size:18px} .gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} }
 
+  /* ===== 分页 ===== */
+  .pager{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;max-width:1120px;margin:22px auto 0;padding:0 20px}
+  .pgbtn{min-width:38px;height:38px;border:0;cursor:pointer;border-radius:11px;padding:0 12px;font-size:14px;font-weight:800;
+    background:rgba(255,255,255,.82);color:var(--ink);box-shadow:var(--shadow);transition:.15s}
+  .pgbtn:hover:not(:disabled){transform:translateY(-1px);color:var(--pink)}
+  .pgbtn.on{background:linear-gradient(135deg,var(--pink),#ff9ec3);color:#fff}
+  .pgbtn:disabled{opacity:.4;cursor:default}
+  .pgbtn.dots{background:transparent;box-shadow:none;cursor:default}
+
   /* ===== 悬浮播放器(可拖动 / 可收起) ===== */
   .player{position:fixed;z-index:30;left:50%;bottom:22px;transform:translateX(-50%);
     width:min(1040px,calc(100vw - 32px));
@@ -236,6 +245,7 @@
   </main>
 
   <div class="gallery" id="galleryView" style="display:none"></div>
+  <div class="pager" id="pager" style="display:none"></div>
 
   <div class="lightbox" id="lightbox">
     <button class="lb-btn lb-close" id="lbClose" aria-label="关闭">✕</button>
@@ -522,8 +532,10 @@
     var voiceView=document.getElementById('voiceView');
     var controls=document.querySelector('.controls');
     var galleryView=document.getElementById('galleryView');
+    var pager=document.getElementById('pager');
     var tabs=document.getElementById('tabs');
-    var galleryBuilt=false;
+    var PAGE_SIZE=12;   // 每页展示数量
+    var gpage=0;
 
     // 视口内才加载完整动图(播放),离开视野换回静态缩略图(省资源)
     var galIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
@@ -535,23 +547,56 @@
       });
     }, { rootMargin:'120px 0px' }) : null;
 
-    function buildGallery(){
-      if(galleryBuilt) return; galleryBuilt=true;
+    function renderGalleryPage(p){
+      var pages=Math.max(1,Math.ceil(GALLERY.length/PAGE_SIZE));
+      gpage=Math.max(0,Math.min(p,pages-1));
+      if(galIO) galIO.disconnect();
+      galleryView.innerHTML='';
+      var start=gpage*PAGE_SIZE, end=Math.min(start+PAGE_SIZE,GALLERY.length);
       var frag=document.createDocumentFragment();
-      GALLERY.forEach(function(item,i){
-        var thumb=(item&&item.thumb)||(item&&item.full)||item;
-        var full=(item&&item.full)||thumb;
-        var card=document.createElement('div'); card.className='gcard';
-        card.setAttribute('data-full',full); card.setAttribute('data-thumb',thumb);
-        var img=document.createElement('img');
-        img.loading='lazy'; img.decoding='async'; img.src=thumb; img.alt='动图 '+(i+1);
-        card.__img=img;
-        card.appendChild(img);
-        card.onclick=function(){ openLb(i); };
-        frag.appendChild(card);
-      });
+      for(var i=start;i<end;i++){
+        (function(gi){
+          var item=GALLERY[gi];
+          var thumb=(item&&item.thumb)||(item&&item.full)||item;
+          var full=(item&&item.full)||thumb;
+          var card=document.createElement('div'); card.className='gcard';
+          card.setAttribute('data-full',full); card.setAttribute('data-thumb',thumb);
+          var img=document.createElement('img');
+          img.loading='lazy'; img.decoding='async'; img.src=thumb; img.alt='动图 '+(gi+1);
+          card.__img=img; card.appendChild(img);
+          card.onclick=function(){ openLb(gi); };
+          frag.appendChild(card);
+        })(i);
+      }
       galleryView.appendChild(frag);
-      if(galIO){ Array.prototype.forEach.call(galleryView.children,function(c){ galIO.observe(c); }); }
+      if(galIO) Array.prototype.forEach.call(galleryView.children,function(c){ galIO.observe(c); });
+      renderPager(pages);
+    }
+
+    function renderPager(pages){
+      pager.innerHTML='';
+      if(pages<=1) return;
+      function mk(txt,pg,cls,dis){ var b=document.createElement('button'); b.className='pgbtn'+(cls||'');
+        b.textContent=txt;
+        if(dis){ b.disabled=true; }
+        else { b.onclick=function(){ renderGalleryPage(pg); window.scrollTo({top:0,behavior:'smooth'}); }; }
+        return b; }
+      pager.appendChild(mk('‹',gpage-1,'',gpage===0));
+      var nums=[];
+      if(pages<=9){ for(var i=0;i<pages;i++) nums.push(i); }
+      else {
+        nums.push(0);
+        var s=Math.max(1,gpage-1), e=Math.min(pages-2,gpage+1);
+        if(s>1) nums.push('.');
+        for(var j=s;j<=e;j++) nums.push(j);
+        if(e<pages-2) nums.push('.');
+        nums.push(pages-1);
+      }
+      nums.forEach(function(n){
+        if(n==='.'){ var d=document.createElement('button'); d.className='pgbtn dots'; d.textContent='…'; d.disabled=true; pager.appendChild(d); }
+        else pager.appendChild(mk(String(n+1),n,n===gpage?' on':''));
+      });
+      pager.appendChild(mk('›',gpage+1,'',gpage===pages-1));
     }
     function switchView(v){
       var g=(v==='gallery');
@@ -559,7 +604,8 @@
       voiceView.style.display=g?'none':'';
       controls.style.display=g?'none':'';
       galleryView.style.display=g?'':'none';
-      if(g) buildGallery();
+      pager.style.display=g?'':'none';
+      if(g) renderGalleryPage(gpage);
       window.scrollTo({top:0,behavior:'smooth'});
     }
     Array.prototype.forEach.call(tabs.children,function(b){ b.onclick=function(){ switchView(b.dataset.view); }; });
