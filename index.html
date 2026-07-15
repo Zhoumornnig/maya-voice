@@ -146,6 +146,9 @@
   .tag{font-size:11px;font-weight:700;color:#fff;padding:2px 9px;border-radius:999px}
   .card .play{margin-left:auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
     background:#fff;box-shadow:var(--shadow);color:var(--pink);font-size:14px}
+  .card .dl{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:#fff;box-shadow:var(--shadow);color:var(--ink);transition:.15s}
+  .card .dl:hover{color:var(--pink);transform:translateY(-1px)}
   .card.playing .play{background:linear-gradient(135deg,var(--pink),#ff9ec3);color:#fff}
   .empty{text-align:center;color:#5b7793;padding:60px 0;font-size:15px}
 
@@ -239,6 +242,7 @@
   .player.collapsed .seekwrap,
   .player.collapsed #shuffle,
   .player.collapsed #autonext,
+  .player.collapsed #downloadLink,
   .player.collapsed #volBtn,
   .player.collapsed #volSlider{display:none}
 
@@ -324,6 +328,7 @@
         <button class="ctrl" id="prev" title="上一条 (←)" aria-label="上一条">⏮</button>
         <button class="ctrl big" id="playpause" title="播放/暂停 (空格)" aria-label="播放或暂停">▶</button>
         <button class="ctrl" id="next" title="下一条 (→)" aria-label="下一条">⏭</button>
+        <a class="ctrl" id="downloadLink" href="#" download title="下载当前音频" aria-label="下载">⬇</a>
         <button class="ctrl toggle" id="shuffle" title="随机" aria-label="随机">🔀</button>
         <button class="ctrl toggle on" id="autonext" title="自动播放下一条" aria-label="自动播放下一条">↻</button>
       </div>
@@ -428,6 +433,7 @@
         card.dataset.id=c.id;
         card.innerHTML='<p class="cn">'+esc(c.cn)+'</p><p class="jp">'+esc(c.jp)+'</p>'+
           '<div class="meta"><span class="tag" style="background:'+cat.color+'">'+cat.label+'</span>'+
+          '<a class="dl" href="'+esc(c.file)+'" download onclick="event.stopPropagation()" title="下载"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>'+
           '<span class="play">▶</span></div>';
         card.onclick=function(){ playClip(c, true); };
         frag.appendChild(card);
@@ -491,7 +497,9 @@
       playClip(clipById(state.order[state.pos]), false);
     }
     function updateNP(){
-      var cat=current?(catMap[current.cat]||{}):{};
+      var dl=document.getElementById('downloadLink');
+      if(current){ dl.href=current.file; dl.download=current.jp+'.mp3'; }
+      else { dl.href='#'; dl.removeAttribute('download'); }
       document.getElementById('npCn').textContent=current?current.cn:'点一条语音开始播放 ✧';
       var jp=document.getElementById('npJp'); jp.textContent=current?current.jp:'摩耶,随时准备起飞!';
       jp.classList.toggle('empty-hint',!current);
